@@ -1,0 +1,21 @@
+/* Estilos "base" do site inteiro: valem para todas as telas. */
+
+:root {
+  color-scheme: dark; /* avisa o navegador que o tema é escuro */
+}
+
+* {
+  box-sizing: border-box; /* faz o tamanho dos elementos ser mais previsível */
+}
+
+body {
+  margin: 0; /* tira a margem branca que o navegador coloca por padrão */
+  background: #06070d; /* fundo quase preto */
+  color: #e8ecf7; /* cor padrão do texto (quase branco) */
+  font-family: system-ui, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh; /* o site ocupa a altura toda da tela, no mínimo */
+}

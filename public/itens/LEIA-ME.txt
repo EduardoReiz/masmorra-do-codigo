@@ -1,0 +1,43 @@
+COMO ADICIONAR A ARTE (asset pack) DOS ITENS
+===========================================
+
+Coloque um PNG por item nesta pasta (public/itens/), com EXATAMENTE
+estes nomes. Tamanho recomendado: 32x32 ou 64x64, fundo transparente.
+Enquanto o arquivo nao existir, o jogo mostra um placeholder pixelado.
+
+cap-couro.png   -> Capuz de Couro [comum]
+cap-ferro.png   -> Elmo de Ferro [comum]
+cap-bronze.png   -> Elmo de Bronze Rúnico [raro]
+cap-tempestade.png   -> Elmo da Tempestade [epico]
+cap-monarca.png   -> Coroa do Monarca [lendario]
+cap-portal.png   -> Elmo do Portal Carmesim [evento]
+col-pano.png   -> Túnica de Pano [comum]
+col-couro.png   -> Peitoral de Couro [comum]
+col-malha.png   -> Cota de Malha [raro]
+col-dragao.png   -> Peitoral do Dragão [epico]
+col-monarca.png   -> Armadura do Monarca [lendario]
+col-portal.png   -> Peitoral de Portal [evento]
+cal-pano.png   -> Calça de Pano [comum]
+cal-couro.png   -> Perneira de Couro [comum]
+cal-malha.png   -> Grevas de Malha [raro]
+cal-runica.png   -> Perneiras Rúnicas [epico]
+cal-monarca.png   -> Perneiras do Monarca [lendario]
+cal-portal.png   -> Grevas de Portal [evento]
+sap-pano.png   -> Sapato de Pano [comum]
+sap-couro.png   -> Bota de Couro [comum]
+sap-ferro.png   -> Botas de Ferro [raro]
+sap-vento.png   -> Botas do Vento [epico]
+sap-monarca.png   -> Botas do Monarca [lendario]
+sap-portal.png   -> Botas de Portal [evento]
+esp-enferrujada.png   -> Espada Enferrujada [comum/espada]
+esp-aco.png   -> Espada de Aço [raro/espada]
+esp-rubra.png   -> Lâmina Rubra [epico/espada]
+esp-monarca.png   -> Espada do Monarca [lendario/espada]
+arc-caca.png   -> Arco de Caça [comum/arco]
+arc-recurvo.png   -> Arco Recurvo [raro/arco]
+arc-tempestade.png   -> Arco da Tempestade [epico/arco]
+arc-monarca.png   -> Arco do Monarca [lendario/arco]
+caj-aprendiz.png   -> Cajado de Aprendiz [comum/cajado]
+caj-cristal.png   -> Cajado de Cristal [raro/cajado]
+caj-arcano.png   -> Cajado Arcano [epico/cajado]
+caj-monarca.png   -> Cajado do Monarca [lendario/cajado]

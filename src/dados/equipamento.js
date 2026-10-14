@@ -1,0 +1,115 @@
+// Sistema de equipamento. Os sprites (pixel-art) vêm de um asset pack: cada
+// item procura /itens/<id>.png e, enquanto o arquivo não existe, o ItemIcon
+// desenha um placeholder procedural. Assim o sistema já funciona hoje e a arte
+// real só "encaixa" quando os PNGs forem colocados em public/itens/.
+
+export const RARIDADES = {
+  comum: { nome: "Comum", cor: "#9aa6bf", ordem: 0 },
+  raro: { nome: "Raro", cor: "#5aa0ff", ordem: 1 },
+  epico: { nome: "Épico", cor: "#b06bff", ordem: 2 },
+  lendario: { nome: "Lendário", cor: "#ffcf5c", ordem: 3 },
+  evento: { nome: "Evento", cor: "#ff5f6d", ordem: 4 }, // só cai em eventos (servidor)
+};
+
+export const SLOTS_EQUIP = [
+  { id: "capacete", nome: "Capacete" },
+  { id: "colete", nome: "Colete" },
+  { id: "calca", nome: "Calça" },
+  { id: "sapato", nome: "Sapato" },
+  { id: "arma", nome: "Arma" },
+];
+
+// cada caminho usa um tipo de arma
+export const ARMA_POR_CLASSE = {
+  "O Arquiteto": "espada",
+  "O Estrategista": "arco",
+  "O Sentinela": "cajado",
+  "O Oráculo": "grimorio",
+};
+export const NOME_ARMA = { espada: "Espada", arco: "Arco", cajado: "Cajado", grimorio: "Grimório" };
+
+export const ITENS = [
+  // ---- capacete ----
+  { id: "cap-couro", slot: "capacete", raridade: "comum", nome: "Capuz de Couro" },
+  { id: "cap-ferro", slot: "capacete", raridade: "comum", nome: "Elmo de Ferro" },
+  { id: "cap-bronze", slot: "capacete", raridade: "raro", nome: "Elmo de Bronze Rúnico" },
+  { id: "cap-tempestade", slot: "capacete", raridade: "epico", nome: "Elmo da Tempestade" },
+  { id: "cap-monarca", slot: "capacete", raridade: "lendario", nome: "Coroa do Monarca" },
+  { id: "cap-portal", slot: "capacete", raridade: "evento", nome: "Elmo do Portal Carmesim" },
+  // ---- colete ----
+  { id: "col-pano", slot: "colete", raridade: "comum", nome: "Túnica de Pano" },
+  { id: "col-couro", slot: "colete", raridade: "comum", nome: "Peitoral de Couro" },
+  { id: "col-malha", slot: "colete", raridade: "raro", nome: "Cota de Malha" },
+  { id: "col-dragao", slot: "colete", raridade: "epico", nome: "Peitoral do Dragão" },
+  { id: "col-monarca", slot: "colete", raridade: "lendario", nome: "Armadura do Monarca" },
+  { id: "col-portal", slot: "colete", raridade: "evento", nome: "Peitoral de Portal" },
+  // ---- calça ----
+  { id: "cal-pano", slot: "calca", raridade: "comum", nome: "Calça de Pano" },
+  { id: "cal-couro", slot: "calca", raridade: "comum", nome: "Perneira de Couro" },
+  { id: "cal-malha", slot: "calca", raridade: "raro", nome: "Grevas de Malha" },
+  { id: "cal-runica", slot: "calca", raridade: "epico", nome: "Perneiras Rúnicas" },
+  { id: "cal-monarca", slot: "calca", raridade: "lendario", nome: "Perneiras do Monarca" },
+  { id: "cal-portal", slot: "calca", raridade: "evento", nome: "Grevas de Portal" },
+  // ---- sapato ----
+  { id: "sap-pano", slot: "sapato", raridade: "comum", nome: "Sapato de Pano" },
+  { id: "sap-couro", slot: "sapato", raridade: "comum", nome: "Bota de Couro" },
+  { id: "sap-ferro", slot: "sapato", raridade: "raro", nome: "Botas de Ferro" },
+  { id: "sap-vento", slot: "sapato", raridade: "epico", nome: "Botas do Vento" },
+  { id: "sap-monarca", slot: "sapato", raridade: "lendario", nome: "Botas do Monarca" },
+  { id: "sap-portal", slot: "sapato", raridade: "evento", nome: "Botas de Portal" },
+  // ---- armas: espada (Arquiteto) ----
+  { id: "esp-enferrujada", slot: "arma", armaTipo: "espada", raridade: "comum", nome: "Espada Enferrujada" },
+  { id: "esp-aco", slot: "arma", armaTipo: "espada", raridade: "raro", nome: "Espada de Aço" },
+  { id: "esp-rubra", slot: "arma", armaTipo: "espada", raridade: "epico", nome: "Lâmina Rubra" },
+  { id: "esp-monarca", slot: "arma", armaTipo: "espada", raridade: "lendario", nome: "Espada do Monarca" },
+  // ---- armas: arco (Estrategista) ----
+  { id: "arc-caca", slot: "arma", armaTipo: "arco", raridade: "comum", nome: "Arco de Caça" },
+  { id: "arc-recurvo", slot: "arma", armaTipo: "arco", raridade: "raro", nome: "Arco Recurvo" },
+  { id: "arc-tempestade", slot: "arma", armaTipo: "arco", raridade: "epico", nome: "Arco da Tempestade" },
+  { id: "arc-monarca", slot: "arma", armaTipo: "arco", raridade: "lendario", nome: "Arco do Monarca" },
+  // ---- armas: cajado (Sentinela) ----
+  { id: "caj-aprendiz", slot: "arma", armaTipo: "cajado", raridade: "comum", nome: "Cajado de Aprendiz" },
+  { id: "caj-cristal", slot: "arma", armaTipo: "cajado", raridade: "raro", nome: "Cajado de Cristal" },
+  { id: "caj-arcano", slot: "arma", armaTipo: "cajado", raridade: "epico", nome: "Cajado Arcano" },
+  { id: "caj-monarca", slot: "arma", armaTipo: "cajado", raridade: "lendario", nome: "Cajado do Monarca" },
+  // ---- armas: grimório (Oráculo) ----
+  { id: "gri-rascunho", slot: "arma", armaTipo: "grimorio", raridade: "comum", nome: "Grimório de Rascunhos" },
+  { id: "gri-cifra", slot: "arma", armaTipo: "grimorio", raridade: "raro", nome: "Grimório Cifrado" },
+  { id: "gri-eco", slot: "arma", armaTipo: "grimorio", raridade: "epico", nome: "Grimório do Eco" },
+  { id: "gri-monarca", slot: "arma", armaTipo: "grimorio", raridade: "lendario", nome: "Grimório do Monarca" },
+];
+
+export function item(id) {
+  return ITENS.find((i) => i.id === id);
+}
+
+function escolhePeso(pesos) {
+  const soma = Object.values(pesos).reduce((a, b) => a + b, 0);
+  let x = Math.random() * soma;
+  for (const [k, v] of Object.entries(pesos)) if ((x -= v) <= 0) return k;
+  return Object.keys(pesos)[0];
+}
+
+// Sorteia um drop ao vencer. Variância de raridade: comum é o mais provável;
+// fratura e chefe empurram para cima. Itens de "evento" NÃO caem aqui (só em
+// eventos do servidor). Pode devolver null (sem drop).
+export function sortearDrop(classe, { chefe, fraturado } = {}) {
+  const baseDrop = chefe || fraturado ? 1 : 0.45;
+  if (Math.random() > baseDrop) return null;
+  let pesos = { comum: 56, raro: 28, epico: 12, lendario: 4 };
+  if (fraturado) pesos = { comum: 20, raro: 38, epico: 30, lendario: 12 };
+  if (chefe) pesos = { comum: 10, raro: 30, epico: 40, lendario: 20 };
+  const raridade = escolhePeso(pesos);
+  const tipoArma = ARMA_POR_CLASSE[classe];
+  const pool = ITENS.filter(
+    (it) => it.raridade === raridade && (it.slot !== "arma" || it.armaTipo === tipoArma)
+  );
+  if (!pool.length) return null;
+  return pool[(Math.random() * pool.length) | 0].id;
+}
+
+// itens que o jogador pode equipar (arma filtrada pela classe)
+export function equipaveisDaClasse(classe) {
+  const tipoArma = ARMA_POR_CLASSE[classe];
+  return ITENS.filter((it) => it.slot !== "arma" || it.armaTipo === tipoArma);
+}
