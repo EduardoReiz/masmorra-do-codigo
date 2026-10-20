@@ -7,6 +7,7 @@ import "./App.css";
 export default function AscensaoMonarca({ monarca, onAceitar, onRecusar }) {
   const nomeMonarca = (monarca && monarca.titulo) || "Monarca";
   const corMonarca = (monarca && monarca.cor) || "#ffd76a";
+  const arte = monarca && monarca.arte;
   const FALAS = [
     { t: "dim", txt: "O Sistema estremece..." },
     { t: "dim", txt: "Nenhum rank acima resta." },
@@ -24,6 +25,7 @@ export default function AscensaoMonarca({ monarca, onAceitar, onRecusar }) {
   const vivoRef = useRef(true);
 
   useEffect(() => {
+    vivoRef.current = true; // o StrictMode desmonta e remonta: religa antes de digitar
     let li = 0, ci = 0;
     function passo() {
       if (!vivoRef.current) return;
@@ -73,6 +75,16 @@ export default function AscensaoMonarca({ monarca, onAceitar, onRecusar }) {
 
         {escolha === "aceitou" && (
           <div className="ascm-fim">
+            {arte && (
+              <img
+                className="ascm-monarca"
+                src={`/monarcas/${arte}.png`}
+                alt={nomeMonarca}
+                draggable="false"
+                style={{ "--mc": corMonarca }}
+                onError={(e) => { e.currentTarget.style.display = "none"; }}
+              />
+            )}
             <div className="ascm-selo" style={{ color: corMonarca }}>{nomeMonarca}</div>
             <p>Você assume o título e a subclasse <b>O Preceptor</b> desperta em você. Guiar outros te tornará mais forte.</p>
             <p className="ascm-nota">Ajudar outros Caçadores ao vivo (e ganhar por isso) chega com o servidor.</p>
@@ -81,6 +93,16 @@ export default function AscensaoMonarca({ monarca, onAceitar, onRecusar }) {
         )}
         {escolha === "recusou" && (
           <div className="ascm-fim">
+            {arte && (
+              <img
+                className="ascm-monarca"
+                src={`/monarcas/${arte}.png`}
+                alt={nomeMonarca}
+                draggable="false"
+                style={{ "--mc": corMonarca }}
+                onError={(e) => { e.currentTarget.style.display = "none"; }}
+              />
+            )}
             <div className="ascm-selo" style={{ color: corMonarca }}>{nomeMonarca}</div>
             <p>Você é Monarca, mas recusa a subclasse. O caminho do Preceptor permanece fechado — por ora.</p>
             <button className="botao" onClick={onRecusar}>Continuar</button>

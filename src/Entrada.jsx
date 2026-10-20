@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import "./App.css";
+import DecryptedText from "./componentes/reactbits/DecryptedText";
 
 // Tela de entrada: fundo interativo (código caindo + Monarca + cursor que
 // explode) e a escolha de caminho. Ao iniciar, chama onIniciar(caminho).
@@ -191,10 +192,11 @@ export default function Entrada({ onIniciar }) {
     };
   }, []);
 
-  function Card({ nome, area, desc, cor }) {
+  function Card({ nome, area, desc, cor, img }) {
     const sel = escolhido === nome;
     return (
       <article className={sel ? "card selecionado" : "card"} style={{ "--c": cor }} onClick={() => setEscolhido(nome)}>
+        <div className="card-arte">{img && <img className="card-heroi" src={img} alt={nome} draggable="false" />}</div>
         <h2 className="cls">{nome}</h2>
         <p className="area">{area}</p>
         <p className="desc">{desc}</p>
@@ -226,15 +228,26 @@ export default function Entrada({ onIniciar }) {
 
         <header className="topo">
           <p className="eyebrow">O SISTEMA DESPERTOU</p>
-          <h1 className="titulo">MASMORRA DO CÓDIGO</h1>
+          <h1 className="titulo">
+            <DecryptedText
+              text="MASMORRA DO CÓDIGO"
+              animateOn="view"
+              sequential
+              speed={38}
+              maxIterations={14}
+              revealDirection="start"
+              characters="01<>/{}[]=+*#ABCDEF"
+              scrambleColor="#0beef5"
+            />
+          </h1>
           <p className="sub">Escolha seu caminho e comece a subir de Rank.</p>
         </header>
 
         <section className="caminhos">
-          <Card nome="O Arquiteto" area="Programação" cor="#0beef5" desc="Constrói mundos com lógica. Algoritmos e linguagens." />
-          <Card nome="O Estrategista" area="Análise e Dev — ADS" cor="#9b7cff" desc="Projeta, integra e entrega sistemas. Da ideia ao deploy." />
-          <Card nome="O Sentinela" area="Cyber Security" cor="#ffcf5c" desc="Defende as muralhas. Caça falhas e blinda sistemas." />
-          <Card nome="O Oráculo" area="Engenharia de Prompt — IA" cor="#b06bff" desc="Conversa com as máquinas. Domina a arte do prompt." />
+          <Card nome="O Arquiteto" area="Programação" cor="#0beef5" img="/herois/heroi-arquiteto.png" desc="Constrói mundos com lógica. Algoritmos e linguagens." />
+          <Card nome="O Estrategista" area="Análise e Dev — ADS" cor="#9b7cff" img="/herois/heroi-estrategista.png" desc="Projeta, integra e entrega sistemas. Da ideia ao deploy." />
+          <Card nome="O Sentinela" area="Cyber Security" cor="#ffcf5c" img="/herois/heroi-sentinela.png" desc="Defende as muralhas. Caça falhas e blinda sistemas." />
+          <Card nome="O Oráculo" area="Engenharia de Prompt — IA" cor="#b06bff" img="/herois/heroi-oraculo.png" desc="Conversa com as máquinas. Domina a arte do prompt." />
         </section>
 
         <button className="botao" disabled={!escolhido} onClick={() => onIniciar(escolhido)}>

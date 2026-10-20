@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./App.css";
+import { RankEmblema } from "./Emblema";
 import BotaoVoltar from "./BotaoVoltar";
 import Despertar from "./Despertar";
 import AscensaoMonarca from "./AscensaoMonarca";
@@ -35,7 +36,7 @@ export default function Dominio({ progresso, onVoltar, onTestarExercicio }) {
   const eq = equipado(progresso);
   const corHeroi = cosmetico(eq.cor)?.valor || "#0beef5";
   const seedHeroi = semente(progresso.classe || "Caçador");
-  const monstro = { nome: "Goblin do Loop Infinito", nivel: "E" };
+  const monstro = { id: "soma", nome: "Goblin do Loop Infinito", nivel: "E" };
   const heroi = { cfg: configPersonagem(progresso), classe: progresso.classe || "O Arquiteto", equip: progresso.equip || {} };
 
   return (
@@ -96,7 +97,7 @@ export default function Dominio({ progresso, onVoltar, onTestarExercicio }) {
         <div className="rankup" onClick={fechar}>
           <div className="rankup-card" onClick={(e) => e.stopPropagation()}>
             <div className="rankup-tag" translate="no">EXAME APROVADO · O SISTEMA RECONHECE VOCÊ</div>
-            <div className="rankup-selo" translate="no">C</div>
+            <RankEmblema rank="C" tamanho={112} className="rankup-selo" />
             <h2>RANK UP</h2>
             <p>Você ascendeu ao <b translate="no">Rank C</b>. Monstros mais fortes já sentem a sua chegada.</p>
             <button className="botao" onClick={fechar}>Continuar</button>

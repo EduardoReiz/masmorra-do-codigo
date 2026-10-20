@@ -1,5 +1,6 @@
 import "./App.css";
 import Personagem from "./Personagem";
+import { RankEmblema } from "./Emblema";
 import { equipado, cosmetico } from "./dados/cosmeticos";
 
 // Retrato do jogador: o personagem pixelado dentro da moldura do rank, com a
@@ -11,7 +12,7 @@ export default function Retrato({ progresso, tamanho = 192, rank, animado = true
   return (
     <div className={`quadro mold-${moldura}` + (compacto ? " compacto" : "")}>
       <Personagem progresso={progresso} tamanho={tamanho} aura={aura} animado={animado} acoes={acoes} />
-      {rank && <span className="quadro-rank" translate="no">{rank}</span>}
+      <RankEmblema rank={rank} tamanho={compacto ? 24 : 44} className="quadro-rank" />
     </div>
   );
 }

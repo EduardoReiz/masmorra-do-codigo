@@ -30,6 +30,7 @@ export default function Despertar({ classe, onConcluir }) {
   const vivoRef = useRef(true);
 
   useEffect(() => {
+    vivoRef.current = true; // o StrictMode desmonta e remonta: religa antes de digitar
     let li = 0, ci = 0;
     function passo() {
       if (!vivoRef.current) return;
@@ -66,6 +67,7 @@ export default function Despertar({ classe, onConcluir }) {
           <span className="sys-dot" /><span className="sys-dot" /><span className="sys-dot" />
           <span className="sys-titulo" translate="no">SISTEMA</span>
         </div>
+        <img className="sys-olho" src="/emblemas/sistema-olho.png" alt="" aria-hidden="true" draggable="false" />
         <div className="sys-corpo">
           {mostradas.map((l, i) => (
             <p key={i} className={"sys-linha " + l.t}>{l.txt}</p>

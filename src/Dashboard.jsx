@@ -6,6 +6,7 @@ import MapaMasmorra from "./MapaMasmorra";
 import Logo from "./Logo";
 import Retrato from "./Retrato";
 import PixelIcone from "./PixelIcone";
+import { RankEmblema, FeitoEmblema } from "./Emblema";
 import { trackDe, ascensao } from "./dados/exercicios";
 import { feitosDe } from "./dados/feitos";
 import { equipado, cosmetico } from "./dados/cosmeticos";
@@ -231,7 +232,7 @@ export default function Dashboard({ progresso, subiuPara, onFecharRankUp, onVolt
               const escondido = !f.ganho;
               return (
                 <div key={f.id} className={"feito " + (f.ganho ? "ganho" : "travado")}>
-                  <div className="feito-icone" translate="no">{f.ganho ? "★" : "?"}</div>
+                  <div className="feito-icone"><FeitoEmblema id={f.id} ganho={f.ganho} /></div>
                   <div className="feito-nome">{escondido ? "??????" : f.nome}</div>
                   <div className="feito-desc">{escondido ? "Ainda oculto." : f.desc}</div>
                 </div>
@@ -279,7 +280,7 @@ export default function Dashboard({ progresso, subiuPara, onFecharRankUp, onVolt
         <div className="rankup" onClick={onFecharRankUp}>
           <div className="rankup-card" onClick={(e) => e.stopPropagation()}>
             <div className="rankup-tag" translate="no">EXAME APROVADO · O SISTEMA RECONHECE VOCÊ</div>
-            <div className="rankup-selo" translate="no">{subiuPara}</div>
+            <RankEmblema rank={subiuPara} tamanho={112} className="rankup-selo" />
             <h2>RANK UP</h2>
             <p>Você ascendeu ao <b translate="no">Rank {subiuPara}</b>. Monstros mais fortes já sentem a sua chegada.</p>
             <button className="botao" onClick={onFecharRankUp}>Continuar</button>

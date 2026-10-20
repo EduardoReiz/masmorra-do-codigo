@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./App.css";
+import { RankEmblema } from "./Emblema";
 import BotaoVoltar from "./BotaoVoltar";
 import { rankDoJogador } from "./dados/exercicios";
 
@@ -59,7 +60,7 @@ export default function Perfil({ progresso, onRenomear, onTrocarCaminho, onReset
           </div>
           <div className="perfil-linha">
             <span className="perfil-k">Rank</span>
-            <span className="perfil-v" translate="no">{rank}</span>
+            <span className="perfil-v" translate="no"><RankEmblema rank={rank} tamanho={26} className="perfil-rank" />{rank}</span>
           </div>
           <div className="perfil-linha">
             <span className="perfil-k">Subclasse</span>

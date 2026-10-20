@@ -250,6 +250,40 @@ body.sem-cursor {
   color: #93a1c4;
 }
 
+/* herói da classe no card (arte do jogo) */
+.card-arte {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 132px;
+  margin: -4px 0 10px;
+}
+.card-heroi {
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 7px 12px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 10px color-mix(in srgb, var(--c) 45%, transparent));
+  animation: heroiFlutua 3.6s ease-in-out infinite;
+  transition: transform 0.2s ease, filter 0.2s ease;
+  will-change: transform;
+}
+.caminhos .card:nth-child(2) .card-heroi { animation-delay: 0.5s; }
+.caminhos .card:nth-child(3) .card-heroi { animation-delay: 1s; }
+.caminhos .card:nth-child(4) .card-heroi { animation-delay: 1.5s; }
+.card:hover .card-heroi,
+.card.selecionado .card-heroi {
+  animation-play-state: paused;
+  transform: scale(1.09) translateY(-6px);
+  filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 20px var(--c));
+}
+@keyframes heroiFlutua {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-heroi { animation: none; }
+}
+
 /* botão */
 .botao {
   pointer-events: auto;
@@ -2952,3 +2986,146 @@ body.sem-cursor {
   .equip-col { gap: 16px; }
   .bolsa-grade { grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); }
 }
+
+/* retrato do monstro na tela do exercício (arte do jogo) */
+.ex-monstro {
+  float: right;
+  width: clamp(120px, 34%, 210px);
+  margin: 2px 0 10px 16px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.5)) drop-shadow(0 0 14px rgba(11, 238, 245, 0.22));
+  animation: exMonstroFlutua 3.8s ease-in-out infinite;
+  shape-outside: margin-box;
+}
+@keyframes exMonstroFlutua { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+@media (prefers-reduced-motion: reduce) { .ex-monstro { animation: none; } }
+
+/* logo: moldura de raízes (arte do jogo) ao redor do nome */
+.logo { height: 126px; }
+.logo-moldura {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: fill; z-index: 0; pointer-events: none;
+  filter: drop-shadow(0 0 10px rgba(138, 43, 226, 0.4));
+}
+.logo-txt {
+  left: 0; top: 0; right: 0; bottom: 0;
+  align-items: center; justify-content: center; text-align: center;
+}
+.logo-l2 { margin-left: 0; }
+
+/* monarca na cena de Ascensão */
+.ascm-monarca {
+  display: block; width: auto; max-height: 230px; margin: 0 auto 8px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.6)) drop-shadow(0 0 26px var(--mc, #ffd76a));
+  animation: ascMonarca 0.9s ease-out both, ascMonFlutua 4s ease-in-out 0.9s infinite;
+}
+@keyframes ascMonarca { 0% { opacity: 0; transform: scale(0.8) translateY(14px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes ascMonFlutua { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@media (prefers-reduced-motion: reduce) { .ascm-monarca { animation: none; } }
+
+/* =================== EMBLEMAS COM ARTE DO JOGO =================== */
+.rank-emblema {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: var(--t);
+  height: var(--t);
+  flex: none;
+}
+.rank-emblema img { width: 100%; height: 100%; image-rendering: pixelated; filter: drop-shadow(0 2px 0 #000); }
+.rank-emblema b {
+  position: absolute;
+  left: 50%; bottom: -6%;
+  transform: translateX(-50%);
+  font-family: "Press Start 2P", monospace;
+  font-weight: 400;
+  font-size: max(7px, calc(var(--t) * 0.2));
+  line-height: 1;
+  padding: max(2px, calc(var(--t) * 0.04)) max(3px, calc(var(--t) * 0.06));
+  color: #fff8e6;
+  background: #120e18;
+  border: 1px solid rgba(255, 207, 92, 0.7);
+  border-radius: 3px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+}
+/* no retrato o escudo fica no lugar da antiga etiqueta */
+.quadro-rank.rank-emblema {
+  position: absolute;
+  bottom: calc(var(--t) * -0.45); left: 50%; transform: translateX(-50%);
+  background: none; padding: 0; box-shadow: none; border-radius: 0;
+}
+.quadro.compacto .quadro-rank.rank-emblema { font-size: inherit; padding: 0; bottom: calc(var(--t) * -0.4); }
+/* cena de rank up: o escudo grande substitui o selo dourado */
+.rankup-selo.rank-emblema {
+  width: var(--t); height: var(--t);
+  background: none; box-shadow: none; border-radius: 0;
+  filter: drop-shadow(0 0 22px rgba(255, 207, 92, 0.7));
+}
+.perfil-rank { vertical-align: middle; margin-right: 6px; }
+.feito-emblema { image-rendering: pixelated; display: block; margin: 0 auto; filter: drop-shadow(0 0 10px rgba(255, 207, 92, 0.45)); }
+.feito-emblema.travado { filter: grayscale(1) brightness(0.28) drop-shadow(0 0 1px #46526e); opacity: 0.8; }
+.pxicone.pxarte { image-rendering: pixelated; object-fit: contain; }
+.voltar-arte { width: 22px; height: 22px; image-rendering: pixelated; }
+.inv-icone.inv-arte { width: 34px; height: 44px; object-fit: contain; image-rendering: auto; filter: drop-shadow(0 0 12px rgba(255, 95, 109, 0.55)); }
+
+/* =================== O CRIADOR COM A ARTE DO JOGO =================== */
+.mapa-criador {
+  display: block; width: 72px; height: 72px;
+  object-fit: contain; object-position: bottom;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 8px rgba(169, 143, 224, 0.7));
+  animation: criadorPaira 2.4s ease-in-out infinite;
+}
+@keyframes criadorPaira { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+.craviso-arte {
+  position: relative;
+  width: min(260px, 62vw);
+  aspect-ratio: 1;
+  margin: 0 auto 6px;
+  filter: drop-shadow(0 0 26px rgba(138, 43, 226, 0.65));
+  animation: criadorSurge 0.9s steps(6) both;
+}
+.craviso-arte img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: bottom; image-rendering: pixelated; }
+/* boca abre e fecha enquanto ele fala */
+.craviso-arte .fala { animation: criadorFala 0.42s steps(1) infinite; }
+.craviso-arte.furia { filter: drop-shadow(0 0 30px rgba(255, 59, 71, 0.6)); animation: criadorSurge 0.9s steps(6) both, criadorTreme 0.18s steps(2) 0.9s 6; }
+@keyframes criadorFala { 0% { opacity: 0; } 50% { opacity: 1; } }
+@keyframes criadorSurge { from { opacity: 0; transform: scale(1.12); filter: brightness(3) blur(2px); } to { opacity: 1; transform: none; } }
+@keyframes criadorTreme { 0% { transform: translate(-3px, 1px); } 100% { transform: translate(3px, -1px); } }
+
+/* o olho do Sistema abre a janela do despertar */
+.sys-olho {
+  display: block;
+  width: 96px; height: auto;
+  margin: 14px auto 0;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 18px rgba(11, 238, 245, 0.55));
+  animation: olhoAbre 1.2s steps(8) both, olhoPulsa 3s ease-in-out 1.2s infinite;
+}
+@keyframes olhoAbre { from { opacity: 0; transform: scaleY(0.1); } to { opacity: 1; transform: none; } }
+@keyframes olhoPulsa { 0%, 100% { filter: drop-shadow(0 0 12px rgba(11, 238, 245, 0.4)); } 50% { filter: drop-shadow(0 0 26px rgba(11, 238, 245, 0.8)); } }
+
+/* =================== LOGO COM A ARTE DO JOGO =================== */
+.logo.logo-arte { width: auto; height: 84px; display: flex; align-items: center; }
+.logo-arte .logo-img {
+  display: block; height: 100%; width: auto;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 10px rgba(138, 43, 226, 0.45));
+}
+/* cópia em ciano por cima, só aparece no instante do glitch */
+.logo-arte .logo-glitch {
+  position: absolute; left: 0; top: 0;
+  opacity: 0;
+  mix-blend-mode: screen;
+  filter: hue-rotate(150deg) saturate(2);
+  animation: logoArteGlitch 7s steps(1) infinite;
+  pointer-events: none;
+}
+@keyframes logoArteGlitch {
+  0%, 91%, 100% { opacity: 0; transform: none; clip-path: none; }
+  92% { opacity: 0.8; transform: translate(-4px, 1px); clip-path: inset(10% 0 55% 0); }
+  94% { opacity: 0.7; transform: translate(3px, -1px); clip-path: inset(60% 0 8% 0); }
+  96% { opacity: 0.5; transform: translate(-2px, 0); clip-path: inset(35% 0 35% 0); }
+}
+@media (max-width: 520px) { .logo.logo-arte { height: 68px; } }

@@ -226,7 +226,14 @@ const ICONES = {
 
 export const NOMES_ICONES = Object.keys(ICONES);
 
+// Ícones da navegação com arte do jogo (public/emblemas/nav). Os demais seguem
+// desenhados em código (os de equipamento são tingidos pela raridade).
+const ARTE_NAV = { mochila: "nav-mochila", avatar: "nav-avatar", perfil: "nav-perfil", dominio: "nav-dominio" };
+
 export default function PixelIcone({ nome, tamanho = 36, cor, className = "" }) {
+  if (ARTE_NAV[nome] && !cor) {
+    return <img className={"pxicone pxarte " + className} src={`/emblemas/nav/${ARTE_NAV[nome]}.png`} width={tamanho} height={tamanho} alt="" aria-hidden="true" draggable="false" />;
+  }
   const ic = ICONES[nome];
   if (!ic) return null;
   const rects = [];

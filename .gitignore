@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+brag-output/
+ferramentas/forja/artes/
+ferramentas/forja/falhas.log
+ferramentas/forja/.chave
+ferramentas/forja/_fonte/
+__pycache__/

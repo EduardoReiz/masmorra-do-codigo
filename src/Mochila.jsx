@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./App.css";
+import { ehCriador } from "./dados/criador";
 import BotaoVoltar from "./BotaoVoltar";
 import ItemIcon from "./ItemIcon";
 import PixelIcone from "./PixelIcone";
@@ -43,8 +44,10 @@ export default function Mochila({ progresso, onEquipar, onAbrirAvatar, onVoltar 
   const [estreito] = useState(() => window.innerWidth < 520); // celular: retrato menor
   const equip = progresso.equip || {};
   const tipoArma = ARMA_POR_CLASSE[progresso.classe];
-  const possuidos = ITENS.filter(
-    (it) => progresso.itensEquip.includes(it.id) && (it.slot !== "arma" || it.armaTipo === tipoArma)
+  // o Criador sempre tem os exclusivos dele (qualquer arma, de qualquer classe)
+  const criador = ehCriador(progresso);
+  const possuidos = ITENS.filter((it) =>
+    it.exclusivo ? criador : progresso.itensEquip.includes(it.id) && (it.slot !== "arma" || it.armaTipo === tipoArma)
   );
   const naBolsa = filtro ? possuidos.filter((it) => it.slot === filtro) : possuidos;
   const fragmentos = progresso.itens.filter((i) => i === "fragmento-portal").length;
@@ -103,7 +106,7 @@ export default function Mochila({ progresso, onEquipar, onAbrirAvatar, onVoltar 
           <div className="dash-sec-label">MATERIAIS</div>
           {fragmentos > 0 ? (
             <div className="inv-item lendario">
-              <span className="inv-icone" translate="no">◆</span>
+              <img className="inv-icone inv-arte" src="/emblemas/item-fragmento.png" alt="" draggable="false" />
               <div>
                 <div className="inv-nome">Fragmento de Portal <span className="inv-tipo">LENDÁRIO</span></div>
                 <div className="inv-desc">Caído de um portal fraturado. Material de forja (futuro).</div>

@@ -40,6 +40,7 @@ export const PALETA_RARIDADE = {
   epico: ["#9b5fd8", "#5f348f", "#c9a0f0"],
   lendario: ["#e8b84a", "#a8782a", "#fff0b0"],
   evento: ["#d84a4a", "#8a2a2a", "#ff9a8a"],
+  criador: ["#3a2a52", "#1a1226", "#a98fe0"],
 };
 
 export const PERSONAGEM_PADRAO = { pele: 0, cabelo: "curto", corCabelo: "castanho" };

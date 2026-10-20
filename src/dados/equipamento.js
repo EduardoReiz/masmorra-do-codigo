@@ -9,6 +9,7 @@ export const RARIDADES = {
   epico: { nome: "Épico", cor: "#b06bff", ordem: 2 },
   lendario: { nome: "Lendário", cor: "#ffcf5c", ordem: 3 },
   evento: { nome: "Evento", cor: "#ff5f6d", ordem: 4 }, // só cai em eventos (servidor)
+  criador: { nome: "Do Criador", cor: "#a98fe0", ordem: 5 }, // exclusivo, nunca cai
 };
 
 export const SLOTS_EQUIP = [
@@ -77,6 +78,14 @@ export const ITENS = [
   { id: "gri-cifra", slot: "arma", armaTipo: "grimorio", raridade: "raro", nome: "Grimório Cifrado" },
   { id: "gri-eco", slot: "arma", armaTipo: "grimorio", raridade: "epico", nome: "Grimório do Eco" },
   { id: "gri-monarca", slot: "arma", armaTipo: "grimorio", raridade: "lendario", nome: "Grimório do Monarca" },
+
+  // ---- exclusivos do Criador: não caem em drop e só aparecem na conta dele ----
+  { id: "cri-coroa", slot: "capacete", raridade: "criador", exclusivo: true, nome: "Coroa de Espinhos Negros" },
+  { id: "cri-manto", slot: "colete", raridade: "criador", exclusivo: true, nome: "Manto da Chama Negra" },
+  { id: "cri-grevas", slot: "calca", raridade: "criador", exclusivo: true, nome: "Grevas do Abismo" },
+  { id: "cri-botas", slot: "sapato", raridade: "criador", exclusivo: true, nome: "Botas do Vazio" },
+  { id: "cri-lamina", slot: "arma", armaTipo: "espada", raridade: "criador", exclusivo: true, nome: "Lâmina do Criador" },
+  { id: "cri-grimorio", slot: "arma", armaTipo: "grimorio", raridade: "criador", exclusivo: true, nome: "Grimório do Criador" },
 ];
 
 export function item(id) {
@@ -102,7 +111,7 @@ export function sortearDrop(classe, { chefe, fraturado } = {}) {
   const raridade = escolhePeso(pesos);
   const tipoArma = ARMA_POR_CLASSE[classe];
   const pool = ITENS.filter(
-    (it) => it.raridade === raridade && (it.slot !== "arma" || it.armaTipo === tipoArma)
+    (it) => !it.exclusivo && it.raridade === raridade && (it.slot !== "arma" || it.armaTipo === tipoArma)
   );
   if (!pool.length) return null;
   return pool[(Math.random() * pool.length) | 0].id;

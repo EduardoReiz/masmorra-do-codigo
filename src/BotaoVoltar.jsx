@@ -9,7 +9,7 @@ export default function BotaoVoltar({ onClick, texto = "voltar" }) {
         <path className="raiz fina" d="M3 33 C 10 26, 4 16, 14 10 S 30 4, 40 8" />
         <path className="raiz fina" d="M107 1 C 100 8, 106 18, 96 24 S 80 30, 70 26" />
       </svg>
-      <span className="voltar-seta" aria-hidden="true">◀</span>
+      <img className="voltar-seta voltar-arte" src="/emblemas/nav/nav-voltar.png" alt="" aria-hidden="true" draggable="false" />
       <span className="voltar-txt">{texto}</span>
     </button>
   );

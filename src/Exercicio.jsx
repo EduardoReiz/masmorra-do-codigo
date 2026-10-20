@@ -158,6 +158,13 @@ export default function Exercicio({ exercicio, fraturado, classe, criador, heroi
 
       <div className="ex-grid">
         <section className="ex-enunciado">
+          <img
+            className="ex-monstro"
+            src={`/monstros/${ex.id}.png`}
+            alt={ex.titulo}
+            draggable="false"
+            onError={(e) => { e.currentTarget.style.display = "none"; }}
+          />
           <h1 className="ex-nome">{ex.titulo}</h1>
           <p className="ex-texto">{ex.enunciado}</p>
           <div className="ex-recompensa" translate="no">
@@ -295,7 +302,7 @@ export default function Exercicio({ exercicio, fraturado, classe, criador, heroi
           corHeroi={heroiCor || "#0beef5"}
           seedHeroi={heroiSeed || 1}
           heroi={heroi}
-          monstro={{ nome: ex.titulo, nivel: nivelMostrado }}
+          monstro={{ id: ex.id, nome: ex.titulo, nivel: nivelMostrado }}
           fraturado={fraturado}
           criador={criador}
           onFim={fimBatalha}

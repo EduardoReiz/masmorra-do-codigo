@@ -1,6 +1,7 @@
 import { useRef, useEffect } from "react";
 import "./App.css";
 import Personagem from "./Personagem";
+import { ehCriador } from "./dados/criador";
 
 // Mapa da masmorra em pixel art, desenhado em canvas de baixa resolução e
 // ampliado (pixelated). Cada monstro da trilha da classe é um ponto do caminho:
@@ -47,7 +48,50 @@ function circulo(ctx, x, y, r, cor) {
   }
 }
 
-function camadaEstatica(W, H, seed, layout) {
+// Artes do jogo (public/mapa). Carregam uma vez; até chegarem, o mapa usa o
+// desenho procedural. Cada arte é reduzida para a escala do canvas (que é
+// ampliado com pixelated), assim os pixels da arte casam com os do mapa.
+const DECOR = ["dec-pinheiro", "dec-carvalho", "dec-arvore-morta", "dec-arbusto", "dec-pedras", "dec-tumba", "dec-cog-ciano", "dec-cog-violeta"];
+const PONTOS = ["ponto-atual", "ponto-bloqueado", "ponto-vencido", "ponto-chefe", "ponto-chefe-vencido"];
+let arteMapa = null;
+function carregaImg(src) {
+  return new Promise((ok) => {
+    const im = new Image();
+    im.onload = () => ok(im);
+    im.onerror = () => ok(null);
+    im.src = src;
+  });
+}
+function carregarArteMapa() {
+  if (!arteMapa) {
+    arteMapa = Promise.all([
+      ...DECOR.map((n) => carregaImg(`/mapa/decoracao/${n}.png`)),
+      ...PONTOS.map((n) => carregaImg(`/mapa/pontos/${n}.png`)),
+    ]).then((ims) => {
+      const arte = {};
+      [...DECOR, ...PONTOS].forEach((n, i) => { if (ims[i]) arte[n] = ims[i]; });
+      return arte;
+    });
+  }
+  return arteMapa;
+}
+// recorta a sobra transparente e reduz para `alto` pixels lógicos
+function reduz(im, alto) {
+  const larg = Math.max(1, Math.round((im.width / im.height) * alto));
+  const c = document.createElement("canvas");
+  c.width = larg; c.height = alto;
+  const ctx = c.getContext("2d");
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  ctx.drawImage(im, 0, 0, larg, alto);
+  // endurece a borda: semitransparente vira cheio ou vazio
+  const d = ctx.getImageData(0, 0, larg, alto);
+  for (let i = 3; i < d.data.length; i += 4) d.data[i] = d.data[i] > 110 ? 255 : 0;
+  ctx.putImageData(d, 0, 0);
+  return c;
+}
+
+function camadaEstatica(W, H, seed, layout, arte) {
   const c = document.createElement("canvas");
   c.width = W; c.height = H;
   const ctx = c.getContext("2d");
@@ -77,6 +121,33 @@ function camadaEstatica(W, H, seed, layout) {
     if (perto(x, y, 9)) continue;
     ctx.fillStyle = "#2a2e36"; ctx.fillRect(x | 0, y | 0, 3, 2);
     ctx.fillStyle = "#3d434e"; ctx.fillRect(x | 0, y | 0, 2, 1);
+  }
+  if (arte && arte["dec-pinheiro"]) {
+    // decoração com a arte do jogo (de trás para frente para sobrepor direito)
+    const TIPOS = [
+      ["dec-pinheiro", 22, 5], ["dec-carvalho", 20, 4], ["dec-arvore-morta", 19, 2], ["dec-arbusto", 9, 3],
+      ["dec-pedras", 8, 2], ["dec-tumba", 9, 1], ["dec-cog-ciano", 6, 1], ["dec-cog-violeta", 6, 1],
+    ].filter(([n]) => arte[n]);
+    const peso = TIPOS.reduce((a, t) => a + t[2], 0);
+    const cache = {};
+    const spr = (n, h) => (cache[n + h] ||= reduz(arte[n], h));
+    const itens = [];
+    for (let i = 0; i < (W * H) / 900; i++) {
+      const x = r() * W, y = r() * (H + 20);
+      let k = r() * peso, tipo = TIPOS[0];
+      for (const t of TIPOS) { k -= t[2]; if (k <= 0) { tipo = t; break; } }
+      const h = Math.round(tipo[1] * (0.8 + r() * 0.4));
+      if (perto(x, y - h / 2, h / 2 + 8)) continue;
+      itens.push({ x, y, n: tipo[0], h });
+    }
+    itens.sort((a, b) => a.y - b.y);
+    for (const it of itens) {
+      const im = spr(it.n, it.h);
+      ctx.fillStyle = "rgba(0,0,0,0.35)";
+      ctx.fillRect(Math.round(it.x - im.width * 0.3), Math.round(it.y - 1), Math.round(im.width * 0.6), 2);
+      ctx.drawImage(im, Math.round(it.x - im.width / 2), Math.round(it.y - im.height));
+    }
+    return { canvas: c, cogumelos: [] };
   }
   // árvores (de trás para frente para sobrepor direito)
   const arvores = [];
@@ -116,7 +187,8 @@ export default function MapaMasmorra({ progresso, track, idxAtual, focoRef, ocul
     const canvas = ref.current;
     if (!canvas) return undefined;
     const ctx = canvas.getContext("2d");
-    let raf, estatico, W, H, S, layout;
+    let raf, estatico, W, H, S, layout, arte = null, vivo = true;
+    const spr = {};
     const vencidos = new Set(derrotados);
     const alvo = idxAtual === -1 ? track.length - 1 : idxAtual;
 
@@ -128,7 +200,7 @@ export default function MapaMasmorra({ progresso, track, idxAtual, focoRef, ocul
       canvas.style.width = W * S + "px"; canvas.style.height = H * S + "px";
       ctx.imageSmoothingEnabled = false;
       layout = layoutTrilha(track.length, W, H, vw >= 900);
-      estatico = camadaEstatica(W, H, hash(progresso.classe || "x"), layout);
+      estatico = camadaEstatica(W, H, hash(progresso.classe || "x"), layout, arte);
       const no = layout.nos[alvo];
       if (focoRef) focoRef.current = { x: no.x * S, y: no.y * S };
       // o herói é posicionado direto no DOM, no mesmo passo do layout
@@ -139,6 +211,15 @@ export default function MapaMasmorra({ progresso, track, idxAtual, focoRef, ocul
     }
     montar();
     window.addEventListener("resize", montar);
+    carregarArteMapa().then((a) => {
+      if (!vivo || !a["ponto-atual"]) return;
+      arte = a;
+      for (const n of PONTOS) if (a[n]) { spr[n] = reduz(a[n], 13); spr[n + "-chefe"] = reduz(a[n], 17); }
+      montar();
+    });
+    // arte do monstro do nó atual (a mesma da batalha)
+    const exAtual = idxAtual !== -1 ? track[idxAtual] : null;
+    if (exAtual) carregaImg(`/monstros/${exAtual.id}.png`).then((im) => { if (vivo && im) spr.monstro = reduz(im, 18); });
 
     const monstros = track.map((ex) => {
       const r = rng(hash(ex.titulo));
@@ -167,6 +248,23 @@ export default function MapaMasmorra({ progresso, track, idxAtual, focoRef, ocul
         const vencido = vencidos.has(ex.id);
         const atual = i === idxAtual;
         const r = ex.chefe ? 6 : 4;
+        if (spr["ponto-atual"]) {
+          const nome = ex.chefe ? (vencido ? "ponto-chefe-vencido" : "ponto-chefe") : vencido ? "ponto-vencido" : atual ? "ponto-atual" : "ponto-bloqueado";
+          const im = spr[nome + (ex.chefe ? "-chefe" : "")] || spr[nome];
+          if (atual) { // anel pulsando
+            const pul = (t * 1.4) % 1;
+            ctx.globalAlpha = 1 - pul;
+            const rr = Math.round(im.width / 2 + pul * 6);
+            ctx.fillStyle = "#0beef5";
+            for (let a = 0; a < 48; a++) {
+              const an = (a / 48) * Math.PI * 2;
+              ctx.fillRect(Math.round(p.x + Math.cos(an) * rr), Math.round(p.y + 2 + Math.sin(an) * rr * 0.5), 1, 1);
+            }
+            ctx.globalAlpha = 1;
+          }
+          ctx.drawImage(im, Math.round(p.x - im.width / 2), Math.round(p.y - im.height / 2));
+          return;
+        }
         if (ex.chefe) { // tochas dos exames
           for (const lado of [-1, 1]) {
             const tx = Math.round(p.x + lado * (r + 4)), ty = Math.round(p.y - 2);
@@ -212,16 +310,23 @@ export default function MapaMasmorra({ progresso, track, idxAtual, focoRef, ocul
       if (idxAtual !== -1) {
         const p = layout.nos[idxAtual], m = monstros[idxAtual], ex = track[idxAtual];
         const bob = Math.sin(t * 3) > 0 ? 0 : 1;
-        const mx = Math.round(p.x + 9), my = Math.round(p.y - m.lin - 2 + bob);
-        ctx.fillStyle = "rgba(0,0,0,0.4)"; ctx.fillRect(mx, my + m.lin + 1, m.cols, 1);
-        for (const [x, y] of m.cel) { ctx.fillStyle = "#05070a"; ctx.fillRect(mx + x, my + y + 1, 1, 1); }
-        ctx.fillStyle = COR_NIVEL[ex.nivel] || "#9b7cff";
-        for (const [x, y] of m.cel) ctx.fillRect(mx + x, my + y, 1, 1);
-        const olho = Math.sin(t * 0.9) > -0.95;
-        if (olho) {
-          ctx.fillStyle = "#ff2d3c";
-          ctx.fillRect(mx + Math.floor(m.cols / 2) - 2, my + 2, 1, 1);
-          ctx.fillRect(mx + Math.floor(m.cols / 2) + 2, my + 2, 1, 1);
+        if (spr.monstro) {
+          const im = spr.monstro;
+          const x0 = Math.round(p.x + 8), y0 = Math.round(p.y + 3 - im.height + bob);
+          ctx.fillStyle = "rgba(0,0,0,0.4)"; ctx.fillRect(x0 + 2, Math.round(p.y + 3), im.width - 4, 1);
+          ctx.drawImage(im, x0, y0);
+        } else {
+          const mx = Math.round(p.x + 9), my = Math.round(p.y - m.lin - 2 + bob);
+          ctx.fillStyle = "rgba(0,0,0,0.4)"; ctx.fillRect(mx, my + m.lin + 1, m.cols, 1);
+          for (const [x, y] of m.cel) { ctx.fillStyle = "#05070a"; ctx.fillRect(mx + x, my + y + 1, 1, 1); }
+          ctx.fillStyle = COR_NIVEL[ex.nivel] || "#9b7cff";
+          for (const [x, y] of m.cel) ctx.fillRect(mx + x, my + y, 1, 1);
+          const olho = Math.sin(t * 0.9) > -0.95;
+          if (olho) {
+            ctx.fillStyle = "#ff2d3c";
+            ctx.fillRect(mx + Math.floor(m.cols / 2) - 2, my + 2, 1, 1);
+            ctx.fillRect(mx + Math.floor(m.cols / 2) + 2, my + 2, 1, 1);
+          }
         }
       }
       // névoa sobre o que ainda não foi explorado
@@ -246,7 +351,7 @@ export default function MapaMasmorra({ progresso, track, idxAtual, focoRef, ocul
       raf = requestAnimationFrame(quadro);
     }
     raf = requestAnimationFrame(quadro);
-    return () => { cancelAnimationFrame(raf); window.removeEventListener("resize", montar); };
+    return () => { vivo = false; cancelAnimationFrame(raf); window.removeEventListener("resize", montar); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chave]);
 
@@ -254,7 +359,9 @@ export default function MapaMasmorra({ progresso, track, idxAtual, focoRef, ocul
     <div className={"mapa-fundo" + (oculto ? " oculto" : "")} aria-hidden="true">
       <canvas ref={ref} className="mapa-canvas" />
       <div ref={heroiRef} className="mapa-heroi">
-        <Personagem progresso={progresso} tamanho={72} />
+        {ehCriador(progresso)
+          ? <img className="mapa-criador" src="/criador/criador-heroi.png" alt="" draggable="false" />
+          : <Personagem progresso={progresso} tamanho={72} />}
       </div>
     </div>
   );

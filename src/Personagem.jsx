@@ -7,6 +7,14 @@ import { W, H, montarSprite, paletasEquip } from "./dados/sprite";
 // contorno escuro estilo "sticker" e anima: respiração, piscada e uma AÇÃO
 // periódica por classe — espada golpeia, arco atira flecha, cajado solta
 // magia, grimório faz coisas surgirem do nada.
+// quadros da chama negra (public/criador/chama); até carregarem, a
+// chama é desenhada pixel a pixel
+const CHAMA = [1, 2, 3, 4].map((n) => {
+  const im = new Image();
+  im.src = `/criador/chama/chama-${n}.png`;
+  return im;
+});
+
 const AURAS = { leve: "#0beef5", intensa: "#0beef5", fratura: "#ff3b47", "chama-negra": "#8a2be2" };
 
 // ---------- componente ----------
@@ -69,7 +77,17 @@ export default function Personagem({ progresso, classe, cfg, equip, aura = "nenh
         ctx.fillStyle = gr;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.globalAlpha = 1;
-        if (aura === "chama-negra") {
+        if (aura === "chama-negra" && CHAMA.every((im) => im.complete && im.naturalWidth)) {
+          // fileira de labaredas, cada uma num quadro diferente do ciclo
+          const q = Math.floor(t * 9);
+          for (let i = 0; i < 5; i++) {
+            const im = CHAMA[(q + i * 3) % 4];
+            const lado = (i % 2 ? 6 : 8) * P;
+            ctx.globalAlpha = i % 2 ? 0.75 : 0.95;
+            ctx.drawImage(im, Math.round((1 + i * 3.6) * P), Math.round(23 * P - lado), lado, lado);
+          }
+          ctx.globalAlpha = 1;
+        } else if (aura === "chama-negra") {
           for (let x = 2; x < 18; x++) {
             const alt = 4 + (Math.sin(t * 6 + x * 1.3) * 0.5 + 0.5) * 9;
             for (let h = 0; h < alt; h++) {
