@@ -5,13 +5,13 @@ import BotaoVoltar from "./BotaoVoltar";
 import Servo from "./Servo";
 import { aulaDe } from "./dados/aulas";
 import { fala } from "./dados/servo";
-import { executar, chamada } from "./executa";
+import { executar, executarPrograma, chamada } from "./executa";
 
 // A aula que vem ANTES do combate: conceito -> demonstração do Criador -> guiado.
 // É obrigatória: só dá para enfrentar o monstro depois de completar o guiado.
 // O Servo do Criador conversa com o aluno do começo ao fim.
 const ETAPAS = ["Conceito", "O Criador faz", "Sua vez"];
-const PASSO_MS = 2400;
+const PASSO_PADRAO_MS = 2400;
 
 export default function Aula({ exercicio, linguagem, onConcluir, onSair }) {
   const aula = useMemo(() => aulaDe(exercicio.id, linguagem.id), [exercicio.id, linguagem.id]);
@@ -119,14 +119,15 @@ function Conceito({ aula, linguagem, onSeguir }) {
 
 // ---- 2. Demonstração: o Criador resolve, passo a passo --------------------
 function Demonstracao({ aula, exercicio, onFala, onVoltar, onSeguir }) {
-  const { codigo, passos, entrada } = aula.demo;
+  const { codigo, passos, entrada, ritmo } = aula.demo;
+  const passoMs = ritmo || PASSO_PADRAO_MS;
   const [i, setI] = useState(0);
   const [tocando, setTocando] = useState(true);
   const [terminou, setTerminou] = useState(false); // já chegou ao último passo
   const passo = passos[i];
   const totalDanos = passos.filter((p) => p.dano).length;
   const danos = passos.slice(0, i + 1).filter((p) => p.dano).length;
-  const hp = Math.round(((totalDanos - danos) / totalDanos) * 100);
+  const hp = Math.round(((totalDanos - danos) / (totalDanos || 1)) * 100);
   const caiu = !!passo.fim;
   const ultimo = passos.length - 1;
   const onFalaRef = useRef(onFala);
@@ -148,7 +149,7 @@ function Demonstracao({ aula, exercicio, onFala, onVoltar, onSeguir }) {
   // reprodução automática
   useEffect(() => {
     if (!tocando || i >= ultimo) return undefined;
-    const t = setTimeout(() => irPara(i + 1, true), PASSO_MS);
+    const t = setTimeout(() => irPara(i + 1, true), passoMs);
     return () => clearTimeout(t);
   }); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -175,7 +176,7 @@ function Demonstracao({ aula, exercicio, onFala, onVoltar, onSeguir }) {
             <img className="aula-criador" src="/criador/criador-heroi.png" alt="O Criador" draggable="false" />
             <div className={"aula-monstro" + (caiu ? " caiu" : "")}>
               <img
-                src={`/monstros/${exercicio.id}.png`}
+                src={`/monstros/${exercicio.arte || exercicio.id}.png`}
                 alt={exercicio.titulo}
                 draggable="false"
                 key={danos}
@@ -186,12 +187,20 @@ function Demonstracao({ aula, exercicio, onFala, onVoltar, onSeguir }) {
             </div>
           </div>
 
-          <div className="aula-vars" translate="no">
-            <div className="aula-vars-titulo">VARIÁVEIS</div>
-            {passo.vars.map(([nome, valor]) => (
-              <div key={nome} className="aula-var"><span>{nome}</span><b>{valor}</b></div>
-            ))}
-          </div>
+          {passo.vars.length > 0 && (
+            <div className="aula-vars" translate="no">
+              <div className="aula-vars-titulo">VARIÁVEIS</div>
+              {passo.vars.map(([nome, valor]) => (
+                <div key={nome} className="aula-var"><span>{nome}</span><b>{valor}</b></div>
+              ))}
+            </div>
+          )}
+          {passo.saida !== undefined && (
+            <div className="aula-tela" translate="no">
+              <div className="aula-tela-titulo">TELA</div>
+              <pre>{passo.saida || " "}</pre>
+            </div>
+          )}
         </div>
       </div>
 
@@ -220,7 +229,8 @@ function Guiado({ aula, exercicio, linguagem, onFala, onVoltar, onConcluir }) {
   const [saida, setSaida] = useState(null);
   const [rodando, setRodando] = useState(false);
   const [passou, setPassou] = useState(false);
-  const testes = aula.guiado.testes;
+  const ehPrograma = exercicio.modo === "programa";
+  const testes = aula.guiado.testes || [];
 
   useEffect(() => { onFala("guiado", "neutro"); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -231,7 +241,9 @@ function Guiado({ aula, exercicio, linguagem, onFala, onVoltar, onConcluir }) {
       return;
     }
     setRodando(true);
-    const r = await executar(linguagem.id, codigo, exercicio.fn, testes);
+    const r = ehPrograma
+      ? await executarPrograma(linguagem.id, codigo, exercicio.saida, exercicio.exige)
+      : await executar(linguagem.id, codigo, exercicio.fn, testes);
     setRodando(false);
     setSaida(r);
     const ok = !r.erro && r.resultados.length && r.resultados.every((x) => x.ok);
@@ -247,7 +259,7 @@ function Guiado({ aula, exercicio, linguagem, onFala, onVoltar, onConcluir }) {
 
   return (
     <div className="aula-cartao aula-guiado">
-      <div className="aula-sub" translate="no">SUA VEZ · PREENCHA AS LACUNAS</div>
+      <div className="aula-sub" translate="no">SUA VEZ · {aula.guiado.starter.includes("___") ? "PREENCHA AS LACUNAS" : "ESCREVA O CÓDIGO"}</div>
       <p className="aula-texto">
         É a mesma solução que o Criador fez. Troque cada <code>___</code> pelo que falta e envie.
       </p>
@@ -263,24 +275,37 @@ function Guiado({ aula, exercicio, linguagem, onFala, onVoltar, onConcluir }) {
         />
       </div>
 
-      <ul className="ex-casos aula-casos" translate="no">
-        {testes.map((t, n) => {
-          const res = saida?.resultados?.[n];
-          const avaliado = res && "ok" in res;
-          return (
-            <li key={n} className={avaliado ? (res.ok ? "ok" : "fail") : ""}>
-              {avaliado && <b>{res.ok ? "✓ " : "✗ "}</b>}
-              <code>{chamada(exercicio.fn, t.in)}</code> → <code>{JSON.stringify(t.out)}</code>
-              {avaliado && !res.ok && <> · veio <code>{JSON.stringify(res.got)}</code></>}
-            </li>
-          );
-        })}
-      </ul>
+      {ehPrograma ? (
+        <div className="ex-tela aula-casos" translate="no">
+          <div className="aula-tela-titulo">O QUE DEVE APARECER NA TELA</div>
+          <pre>{exercicio.saida}</pre>
+          {saida && !saida.erro && (
+            <>
+              <div className="aula-tela-titulo">O SEU PROGRAMA MOSTROU</div>
+              <pre>{saida.got === "" ? "(nada apareceu na tela)" : saida.got}</pre>
+            </>
+          )}
+        </div>
+      ) : (
+        <ul className="ex-casos aula-casos" translate="no">
+          {testes.map((t, n) => {
+            const res = saida?.resultados?.[n];
+            const avaliado = res && "ok" in res;
+            return (
+              <li key={n} className={avaliado ? (res.ok ? "ok" : "fail") : ""}>
+                {avaliado && <b>{res.ok ? "✓ " : "✗ "}</b>}
+                <code>{chamada(exercicio.fn, t.in)}</code> → <code>{JSON.stringify(t.out)}</code>
+                {avaliado && !res.ok && <> · veio <code>{JSON.stringify(res.got)}</code></>}
+              </li>
+            );
+          })}
+        </ul>
+      )}
 
       {saida?.erro && <div className="ex-erro">{saida.erro}</div>}
       {saida && !saida.erro && (
         <div className={"ex-resultado " + (totalOk === saida.resultados.length ? "ok" : "fail")}>
-          {totalOk} de {saida.resultados.length} testes passaram
+          {totalOk} de {saida.resultados.length} {ehPrograma ? "requisitos atendidos" : "testes passaram"}
         </div>
       )}
 

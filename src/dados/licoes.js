@@ -3,6 +3,36 @@
 // entregar o código, e termos para o jogador pesquisar. Para quem prefere ler
 // a assistir vídeo. Chave = id do exercício.
 export const LICOES = {
+  oi: {
+    conceito: "Mostrar um texto na tela",
+    leitura: "Um programa é uma lista de ordens para o computador. A primeira ordem que todo mundo aprende é mostrar uma mensagem na tela. O texto vai entre aspas, e o que estiver entre aspas aparece exatamente como foi escrito.",
+    passos: ["Escolha o comando de mostrar na tela da sua linguagem.", "Entre parênteses, escreva o texto entre aspas.", "Rode e confira se a mensagem saiu igual à pedida."],
+    pesquisa: ["hello world javascript console.log", "hello world python print"],
+  },
+  nome: {
+    conceito: "Guardar um valor numa variável",
+    leitura: "Uma variável é uma caixinha com nome onde você guarda um valor para usar depois. Você dá um nome, guarda o valor com o sinal de igual e, quando quiser o valor de volta, é só escrever o nome da caixinha.",
+    passos: ["Crie a variável nome guardando o texto.", "Monte a mensagem juntando os pedaços de texto com +.", "Mostre a mensagem na tela."],
+    pesquisa: ["variáveis para iniciantes", "concatenar textos"],
+  },
+  contas: {
+    conceito: "Contas com números",
+    leitura: "O computador é uma calculadora muito rápida. Para somar usamos +, para multiplicar usamos *. Você pode escrever a conta direto dentro do comando de mostrar na tela, e ele mostra o resultado.",
+    passos: ["Escreva a primeira conta e mostre o resultado.", "Escreva a segunda conta e mostre o resultado.", "Confira se saíram duas linhas: 12 e 42."],
+    pesquisa: ["operadores aritméticos", "operador de multiplicação programação"],
+  },
+  dobro: {
+    conceito: "Funções: uma receita que recebe e devolve",
+    leitura: "Uma função é uma receita com nome: você entrega os ingredientes (os parâmetros), ela faz o trabalho e devolve o prato pronto (o return). Quase tudo que você vai escrever daqui para frente é uma função.",
+    passos: ["Dê um nome à função e diga o que ela recebe.", "Calcule o dobro do valor recebido.", "Devolva o resultado com return."],
+    pesquisa: ["o que é uma função", "return em programação"],
+  },
+  portao: {
+    conceito: "Decisão e repetição juntas",
+    leitura: "Aqui você junta tudo: um laço percorre os números de 1 até n, um if decide se cada número é par e uma variável vai acumulando a soma só dos pares. Cada peça você já domina; o desafio é encaixá-las.",
+    passos: ["Crie uma variável total valendo 0.", "Percorra os números de 1 até n.", "Se o número for par, some ao total.", "Devolva o total."],
+    pesquisa: ["laço com if dentro", "acumulador condicional"],
+  },
   soma: {
     conceito: "Laço de repetição e variável acumuladora",
     leitura:

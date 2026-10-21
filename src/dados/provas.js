@@ -17,6 +17,7 @@ const pick = (r, arr, n) => {
 
 // referências (as mesmas já verificadas) usadas para calcular a resposta certa
 const ref = {
+  somaPares: (n) => { let s = 0; for (let i = 2; i <= n; i += 2) s += i; return s; },
   inverteNumero: (n) => Math.sign(n) * parseInt(String(Math.abs(n)).split("").reverse().join(""), 10),
   ehPrimo: (n) => { if (n < 2) return false; for (let i = 2; i * i <= n; i++) if (n % i === 0) return false; return true; },
   ehPalindromo: (t) => t === t.split("").reverse().join(""),
@@ -28,6 +29,13 @@ const ref = {
 
 export const PROVAS = {
   // ---- Arquiteto ----
+  portao: {
+    mc: [
+      { p: "Por que o if fica DENTRO do laço, e não depois dele?", opcoes: ["Porque a decisão (é par?) precisa ser tomada para cada número que o laço percorre", "Porque o if só funciona dentro de laços", "Para o código ficar mais bonito, sem mudar o resultado"], correta: 0 },
+      { p: "Se o número NÃO for par, o que acontece com o total naquela volta?", opcoes: ["Nada: o bloco do if é pulado e o total continua igual", "O total volta a ser zero", "O programa para de repetir"], correta: 0 },
+    ],
+    prever: { fn: "somaPares", solucao: ref.somaPares, dica: "um número inteiro", gera: (r) => [[intEntre(r, 5, 12)], [intEntre(r, 13, 30)], [intEntre(r, 1, 4)], [intEntre(r, 40, 80)]] },
+  },
   "exame-e": {
     mc: [
       { p: "Por que guardamos o sinal (+/-) antes de inverter os dígitos?", opcoes: ["Porque o '-' não é um dígito e atrapalharia a inversão", "Porque números negativos não podem ser invertidos", "Só por organização, não muda nada"], correta: 0 },

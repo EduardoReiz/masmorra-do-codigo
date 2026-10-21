@@ -5,7 +5,7 @@ import BotaoVoltar from "./BotaoVoltar";
 import { RANKS } from "./dados/exercicios";
 import { AJUDA, linkAula } from "./dados/ajuda";
 import { LICOES, linkPesquisa } from "./dados/licoes";
-import { executar, chamada, avaliarPrompt } from "./executa";
+import { executar, executarPrograma, chamada, avaliarPrompt } from "./executa";
 import { starterDe } from "./dados/linguagens";
 import Batalha from "./Batalha";
 import ItemIcon from "./ItemIcon";
@@ -41,9 +41,11 @@ export default function Exercicio({ exercicio, fraturado, classe, criador, lingu
   const ajuda = AJUDA[ex.id];
   const licao = LICOES[ex.id];
   const ehPrompt = ex.tipo === "prompt";
+  const ehPrograma = ex.modo === "programa"; // escreve na tela, em vez de devolver um valor
+  const arte = ex.arte || ex.id; // imagem do monstro (provisória, quando o monstro ainda não tem arte própria)
   const ehSeguranca = ex.tipo === "seguranca";
   const ehDados = ex.tipo === "dados";
-  const testes = ehPrompt ? [] : fraturado ? [...ex.testes, ...(ex.fratura || [])] : ex.testes;
+  const testes = ehPrompt || ehPrograma ? [] : fraturado ? [...ex.testes, ...(ex.fratura || [])] : ex.testes;
   const xpGanho = ex.xp * (fraturado ? 2 : 1);
   const nivelMostrado = fraturado ? nivelAcima(ex.nivel) : ex.nivel;
 
@@ -91,7 +93,11 @@ export default function Exercicio({ exercicio, fraturado, classe, criador, lingu
   }
 
   async function enfrentar() {
-    const r = ehPrompt ? avaliarPrompt(codigo, ex.requisitos) : await executar(lang.id, codigo, ex.fn, testes);
+    const r = ehPrompt
+      ? avaliarPrompt(codigo, ex.requisitos)
+      : ehPrograma
+        ? await executarPrograma(lang.id, codigo, ex.saida, ex.exige)
+        : await executar(lang.id, codigo, ex.fn, testes);
     setSaida(r);
     if (r.erro) return; // não compilou / prompt curto demais: só mostra o aviso
     const ok = r.resultados.length && r.resultados.every((x) => x.ok);
@@ -99,7 +105,7 @@ export default function Exercicio({ exercicio, fraturado, classe, criador, lingu
       const f = [];
       if (colouRef.current) f.push(ehPrompt ? "colou o prompt" : "colou código no editor");
       if (saiuRef.current > 0) f.push(`saiu da aba ${saiuRef.current}x`);
-      if (Date.now() - inicioRef.current < LIMITE_RAPIDO_MS) f.push("resolveu rápido demais");
+      if (!ex.semLimiteDeTempo && Date.now() - inicioRef.current < LIMITE_RAPIDO_MS) f.push("resolveu rápido demais");
       setFlags(f);
       setDrop(sortearDrop(classe, { chefe: ex.chefe, fraturado }));
       setBatalha("vitoria");
@@ -127,12 +133,14 @@ export default function Exercicio({ exercicio, fraturado, classe, criador, lingu
       setProva(true);
     } else {
       // monstro comum: técnica avançada além do nível? prove que entende
-      const perguntas = ehPrompt || lang.id !== "js" ? [] : analisarEstilo(codigo, ex.nivel);
+      const perguntas = ehPrompt || ehPrograma || lang.id !== "js" ? [] : analisarEstilo(codigo, ex.nivel);
       if (perguntas.length) setProvaEstilo({ mc: perguntas });
       else setVenceu(true);
     }
   }
 
+  // nos programas, o primeiro resultado é a saída; os demais são o que o monstro exige do código
+  const itensExigidos = ehPrograma ? (saida?.resultados?.length ? saida.resultados.slice(1) : ex.exige || []) : [];
   const publicos = saida?.resultados.filter((r) => r.publico) ?? [];
   const totalOk = saida?.resultados.filter((r) => r.ok).length ?? 0;
   const ocultosFalharam = saida && !saida.erro && saida.resultados.some((r) => !r.publico && !r.ok);
@@ -162,7 +170,7 @@ export default function Exercicio({ exercicio, fraturado, classe, criador, lingu
         <section className="ex-enunciado">
           <img
             className="ex-monstro"
-            src={`/monstros/${ex.id}.png`}
+            src={`/monstros/${arte}.png`}
             alt={ex.titulo}
             draggable="false"
             onError={(e) => { e.currentTarget.style.display = "none"; }}
@@ -225,8 +233,25 @@ export default function Exercicio({ exercicio, fraturado, classe, criador, lingu
             </div>
           )}
 
-          <div className="ex-sec">{ehPrompt ? "O que um bom prompt precisa ter" : ehSeguranca ? "Testes (incluem ataques)" : "Casos de teste"}</div>
-          {ehPrompt ? (
+          <div className="ex-sec">{ehPrompt ? "O que um bom prompt precisa ter" : ehPrograma ? "O que deve aparecer na tela" : ehSeguranca ? "Testes (incluem ataques)" : "Casos de teste"}</div>
+          {ehPrograma ? (
+            <div className="ex-tela">
+              <pre translate="no">{ex.saida}</pre>
+              {itensExigidos.length > 0 && (
+                <ul className="ex-casos ex-requisitos">
+                  {itensExigidos.map((r, i) => {
+                    const avaliado = "ok" in r;
+                    return (
+                      <li key={i} className={avaliado ? (r.ok ? "ok" : "fail") : ""}>
+                        {avaliado && <b>{r.ok ? "✓ " : "✗ "}</b>}
+                        {r.nome}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          ) : ehPrompt ? (
             <ul className="ex-casos ex-requisitos">
               {(saida?.resultados?.length ? saida.resultados : ex.requisitos).map((r, i) => {
                 const avaliado = "ok" in r;
@@ -289,9 +314,15 @@ export default function Exercicio({ exercicio, fraturado, classe, criador, lingu
             </button>
           </div>
           {saida?.erro && <div className="ex-erro">{saida.erro}</div>}
+          {ehPrograma && saida && !saida.erro && (
+            <div className="ex-veio">
+              <div className="ex-veio-titulo" translate="no">O SEU PROGRAMA MOSTROU</div>
+              <pre translate="no">{saida.got === "" ? "(nada apareceu na tela)" : saida.got}</pre>
+            </div>
+          )}
           {saida && !saida.erro && (
             <div className={"ex-resultado " + (totalOk === saida.resultados.length ? "ok" : "fail")}>
-              {totalOk} de {saida.resultados.length} {ehPrompt ? "requisitos atendidos" : "testes passaram"}
+              {totalOk} de {saida.resultados.length} {ehPrompt || ehPrograma ? "requisitos atendidos" : "testes passaram"}
               {!ehPrompt && ocultosFalharam && <span className="ex-oculto"> — alguns casos ocultos falharam</span>}
             </div>
           )}
@@ -304,7 +335,7 @@ export default function Exercicio({ exercicio, fraturado, classe, criador, lingu
           corHeroi={heroiCor || "#0beef5"}
           seedHeroi={heroiSeed || 1}
           heroi={heroi}
-          monstro={{ id: ex.id, nome: ex.titulo, nivel: nivelMostrado }}
+          monstro={{ id: arte, nome: ex.titulo, nivel: nivelMostrado }}
           fraturado={fraturado}
           criador={criador}
           onFim={fimBatalha}

@@ -3,6 +3,26 @@
 // ar); abre uma BUSCA no YouTube já montada com o tema + canais que ensinam
 // bem (Curso em Vídeo / Gustavo Guanabara e cia), caindo sempre em algo útil.
 export const AJUDA = {
+  oi: {
+    dica: 'Em JavaScript use console.log("texto"); em Python use print("texto"). O texto vai entre aspas, e o que está entre aspas aparece igualzinho na tela.',
+    aula: { canal: "Curso em Vídeo", q: "curso em video python mundo 1 primeiro programa print" },
+  },
+  nome: {
+    dica: "Crie a variável com uma linha (nome = ... ) e use o nome dela dentro da mensagem, juntando os pedaços com +.",
+    aula: { canal: "Curso em Vídeo", q: "curso em video python variáveis tipos primitivos" },
+  },
+  contas: {
+    dica: "Os operadores são + para somar e * para multiplicar. Você pode escrever a conta direto dentro do print ou do console.log.",
+    aula: { canal: "Curso em Vídeo", q: "curso em video python operadores aritméticos" },
+  },
+  dobro: {
+    dica: "Uma função recebe um valor (n) e devolve um resultado com return. Aqui o resultado é n multiplicado por 2.",
+    aula: { canal: "Curso em Vídeo", q: "curso em video funções return parâmetros" },
+  },
+  portao: {
+    dica: "Junte o que já aprendeu: um laço de 1 até n, um if para ver se o número é par (resto da divisão por 2 igual a 0) e uma variável que soma só os pares.",
+    aula: { canal: "Curso em Vídeo", q: "curso em video estrutura de repetição com condição" },
+  },
   soma: {
     dica: "Crie uma variável 'total' valendo 0 e vá somando cada número de 1 até n dentro de um laço for.",
     aula: { canal: "Curso em Vídeo", q: "curso em video javascript estrutura de repetição for" },

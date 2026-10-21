@@ -219,7 +219,7 @@ export default function MapaMasmorra({ progresso, track, idxAtual, focoRef, ocul
     });
     // arte do monstro do nó atual (a mesma da batalha)
     const exAtual = idxAtual !== -1 ? track[idxAtual] : null;
-    if (exAtual) carregaImg(`/monstros/${exAtual.id}.png`).then((im) => { if (vivo && im) spr.monstro = reduz(im, 18); });
+    if (exAtual) carregaImg(`/monstros/${exAtual.arte || exAtual.id}.png`).then((im) => { if (vivo && im) spr.monstro = reduz(im, 18); });
 
     const monstros = track.map((ex) => {
       const r = rng(hash(ex.titulo));

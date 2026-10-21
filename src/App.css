@@ -3232,3 +3232,13 @@ body.sem-cursor {
   .aula-demo-grid { grid-template-columns: 1fr; }
   .aula-sintaxe li { grid-template-columns: 1fr; }
 }
+
+/* ======= Monstros que pedem um programa (saída na tela) ======= */
+.ex-tela pre, .ex-veio pre, .aula-tela pre {
+  margin: 0 0 10px; padding: 12px 14px; background: #060a14; border: 1px solid #1c2842; border-left: 3px solid #0beef5;
+  border-radius: 8px; color: #bfe9ff; font-family: "Courier New", monospace; font-size: 15px; line-height: 1.6; white-space: pre-wrap;
+}
+.ex-veio { margin: 0 16px 12px; }
+.ex-veio-titulo, .aula-tela-titulo { font-family: "Courier New", monospace; font-size: 10px; letter-spacing: 0.14em; color: #5f7390; margin-bottom: 6px; }
+.aula-tela { padding: 10px 12px; background: #0e1426; border: 1px solid #1c2842; border-radius: 10px; }
+.aula-tela pre { margin: 0; min-height: 28px; }

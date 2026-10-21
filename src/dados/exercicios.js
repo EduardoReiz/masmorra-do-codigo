@@ -7,17 +7,54 @@ import { intEntre, listaInts } from "./gerador";
 // vencer um chefe é o que promove o jogador de rank — não basta acumular XP.
 // "fratura" = testes extras, bem mais duros, usados quando o portal fratura.
 export const EXERCICIOS = [
+  // ---- A rampa do básico: os primeiros passos de quem nunca programou ----
+  // "modo: programa" = o monstro pede um programa, e o jogo confere o que ele escreve na tela.
+  // "arte" = imagem provisória de outro monstro, até a arte própria ficar pronta.
   {
-    id: "soma", fn: "soma", nivel: "E", xp: 120,
-    titulo: "Goblin do Loop Infinito", fraqueza: "Repetição", tempo: "~10 min",
-    enunciado: "Escreva soma(n) que devolve a soma de todos os números de 1 até n.",
-    starter: "function soma(n) {\n  // some de 1 até n\n\n}\n",
+    id: "oi", modo: "programa", nivel: "E", xp: 60, semLimiteDeTempo: true,
+    titulo: "Fantasma do Silêncio", fraqueza: "Mostrar na tela", tempo: "~3 min", arte: "orac-explica",
+    enunciado: "Escreva um programa que mostra na tela exatamente isto: Oi, Criador!",
+    saida: "Oi, Criador!",
+    exige: [],
+    starter: "// escreva o seu programa aqui\n",
+    porLinguagem: { py: { starter: "# escreva o seu programa aqui\n" } },
+  },
+  {
+    id: "nome", modo: "programa", nivel: "E", xp: 60, semLimiteDeTempo: true,
+    titulo: "Escrivão do Nome", fraqueza: "Variáveis", tempo: "~5 min", arte: "sec-idade",
+    enunciado:
+      'Crie uma variável chamada nome guardando o texto "Criador" e use essa variável para mostrar na tela: Oi, Criador!',
+    saida: "Oi, Criador!",
+    exige: [
+      { nome: "Cria a variável nome", re: "\\bnome\\s*=(?!=)" },
+      { nome: "Usa a variável nome na mensagem", re: "\\bnome\\b", min: 2 },
+    ],
+    starter: "// crie a variável nome e mostre a mensagem\n",
+    porLinguagem: { py: { starter: "# crie a variável nome e mostre a mensagem\n" } },
+  },
+  {
+    id: "contas", modo: "programa", nivel: "E", xp: 80, semLimiteDeTempo: true,
+    titulo: "Calculadora Amaldiçoada", fraqueza: "Contas com números", tempo: "~5 min", arte: "dat-conta",
+    enunciado: "Mostre na tela, uma por linha, o resultado de 8 + 4 e o resultado de 6 × 7. A tela deve mostrar 12 e depois 42.",
+    saida: "12\n42",
+    exige: [
+      { nome: "Faz a conta de somar com +", re: "\\d+\\s*\\+\\s*\\d+" },
+      { nome: "Faz a conta de multiplicar com *", re: "\\d+\\s*\\*\\s*\\d+" },
+    ],
+    starter: "// mostre o resultado das duas contas\n",
+    porLinguagem: { py: { starter: "# mostre o resultado das duas contas\n" } },
+  },
+  {
+    id: "dobro", fn: "dobro", nivel: "E", xp: 100,
+    titulo: "Duplicador Travesso", fraqueza: "Funções", tempo: "~6 min", arte: "dat-total",
+    enunciado: "Escreva a função dobro(n) que devolve o dobro do número n. Ex: dobro(4) devolve 8.",
+    starter: "function dobro(n) {\n  // devolva o dobro de n\n\n}\n",
     molde: true,
-    solucao: (n) => (n * (n + 1)) / 2,
+    solucao: (n) => n * 2,
     gerarEntradas: (r) => ({
-      publicas: [[3], [5], [intEntre(r, 2, 12)]],
-      ocultas: [[0], [1], [intEntre(r, 80, 300)]],
-      fratura: [[intEntre(r, 800, 3000)], [intEntre(r, 5000, 9999)], [2]],
+      publicas: [[4], [10], [intEntre(r, 1, 30)]],
+      ocultas: [[0], [-3], [intEntre(r, 100, 900)]],
+      fratura: [[intEntre(r, -500, 500)], [intEntre(r, 1000, 9999)], [1]],
     }),
   },
   {
@@ -34,22 +71,35 @@ export const EXERCICIOS = [
     }),
   },
   {
-    id: "exame-e", fn: "inverteNumero", nivel: "E", xp: 300,
-    chefe: true, promoveA: "D",
-    titulo: "Portão de Bronze", fraqueza: "Dígitos e sinal", tempo: "~15 min",
+    id: "soma", fn: "soma", nivel: "E", xp: 120,
+    titulo: "Goblin do Loop Infinito", fraqueza: "Repetição", tempo: "~10 min",
+    enunciado: "Escreva soma(n) que devolve a soma de todos os números de 1 até n.",
+    starter: "function soma(n) {\n  // some de 1 até n\n\n}\n",
+    molde: true,
+    solucao: (n) => (n * (n + 1)) / 2,
+    gerarEntradas: (r) => ({
+      publicas: [[3], [5], [intEntre(r, 2, 12)]],
+      ocultas: [[0], [1], [intEntre(r, 80, 300)]],
+      fratura: [[intEntre(r, 800, 3000)], [intEntre(r, 5000, 9999)], [2]],
+    }),
+  },
+  {
+    id: "portao", fn: "somaPares", nivel: "E", xp: 300,
+    chefe: true, promoveA: "D", arte: "exame-e",
+    titulo: "Portão de Bronze", fraqueza: "Decisão e repetição juntas", tempo: "~12 min",
     enunciado:
-      "EXAME DE ASCENSÃO. Escreva inverteNumero(n) que inverte os dígitos de n, " +
-      "mantendo o sinal e sem zeros à esquerda. Ex: 120 vira 21, -45 vira -54.",
-    starter: "function inverteNumero(n) {\n  // inverte os dígitos, mantém o sinal\n\n}\n",
+      "EXAME DE ASCENSÃO. Escreva somaPares(n) que devolve a soma de todos os números pares de 1 até n. " +
+      "Ex: somaPares(6) = 2 + 4 + 6 = 12.",
+    starter: "function somaPares(n) {\n  // some só os pares de 1 até n\n\n}\n",
     testes: [
-      { in: [123], out: 321, publico: true },
-      { in: [-45], out: -54, publico: true },
-      { in: [120], out: 21, publico: true },
-      { in: [5], out: 5, publico: false },
+      { in: [6], out: 12, publico: true },
+      { in: [10], out: 30, publico: true },
+      { in: [1], out: 0, publico: true },
       { in: [0], out: 0, publico: false },
-      { in: [1000], out: 1, publico: false },
-      { in: [-100], out: -1, publico: false },
-      { in: [2100], out: 12, publico: false },
+      { in: [2], out: 2, publico: false },
+      { in: [7], out: 12, publico: false },
+      { in: [100], out: 2550, publico: false },
+      { in: [51], out: 650, publico: false },
     ],
   },
   {
@@ -83,6 +133,24 @@ export const EXERCICIOS = [
       { in: ["aeiouaeiou"], out: 10, publico: false },
       { in: ["bcdfg"], out: 0, publico: false },
       { in: ["programacao"], out: 5, publico: false },
+    ],
+  },
+  {
+    id: "exame-e", fn: "inverteNumero", nivel: "D", xp: 220, arte: "inverte",
+    titulo: "Espelho Numérico", fraqueza: "Dígitos e sinal", tempo: "~15 min",
+    enunciado:
+      "Escreva inverteNumero(n) que inverte os dígitos de n, " +
+      "mantendo o sinal e sem zeros à esquerda. Ex: 120 vira 21, -45 vira -54.",
+    starter: "function inverteNumero(n) {\n  // inverte os dígitos, mantém o sinal\n\n}\n",
+    testes: [
+      { in: [123], out: 321, publico: true },
+      { in: [-45], out: -54, publico: true },
+      { in: [120], out: 21, publico: true },
+      { in: [5], out: 5, publico: false },
+      { in: [0], out: 0, publico: false },
+      { in: [1000], out: 1, publico: false },
+      { in: [-100], out: -1, publico: false },
+      { in: [2100], out: 12, publico: false },
     ],
   },
   {
