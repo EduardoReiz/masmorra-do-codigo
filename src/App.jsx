@@ -10,6 +10,10 @@ import Login from "./Login";
 import Perfil from "./Perfil";
 import Mochila from "./Mochila";
 import Dominio from "./Dominio";
+import Aula from "./Aula";
+import Linguagem from "./Linguagem";
+import { aulaDe } from "./dados/aulas";
+import { linguagemDoJogador } from "./dados/linguagens";
 import { trackDe, rankDe, idsParaComecarEm } from "./dados/exercicios";
 import { AVATAR_PADRAO, equipado, cosmetico, semente } from "./dados/cosmeticos";
 import { ehCriador, AVATAR_CRIADOR } from "./dados/criador";
@@ -25,6 +29,8 @@ function telaInicial() {
   const pedida = new URLSearchParams(window.location.search).get("tela");
   if (pedida && c.conta && (pedida !== "dominio" || ehCriador(c))) return pedida;
   if (!c.conta) return "login";
+  // o Arquiteto ainda sem linguagem (inclusive quem já jogava antes dela existir) escolhe agora
+  if (c.classe === "O Arquiteto" && !c.linguagem) return "linguagem";
   return c.classe ? "dashboard" : "entrada";
 }
 
@@ -93,7 +99,14 @@ function App() {
   function iniciar(caminho) {
     const p = { ...progresso, classe: caminho };
     atualizar(p);
+    // no caminho do Arquiteto, quem escolhe a linguagem é o aluno
+    if (caminho === "O Arquiteto" && !p.linguagem) { setTela("linguagem"); return; }
     setTela(p.despertou ? "dashboard" : "despertar");
+  }
+
+  function escolherLinguagem(id) {
+    atualizar({ ...progresso, linguagem: id });
+    setTela(progresso.despertou ? "dashboard" : "despertar");
   }
 
   function despertar() {
@@ -147,7 +160,9 @@ function App() {
     const elegivel = ex && !ex.chefe && ex.tipo !== "prompt" && !progresso.derrotados.includes(id);
     setFraturado(elegivel && Math.random() < CHANCE_FRATURA);
     setExId(id);
-    setTela("exercicio");
+    // a aula é obrigatória na primeira vez que o aluno enfrenta o monstro
+    const temAula = ex && !progresso.derrotados.includes(id) && aulaDe(id, linguagemDoJogador(progresso).id);
+    setTela(temAula ? "aula" : "exercicio");
   }
 
   // Calcula o progresso após uma vitória limpa (sem mexer no estado ainda).
@@ -238,12 +253,36 @@ function App() {
     return <Login onEntrar={entrarConta} />;
   }
 
+  if (tela === "linguagem") {
+    return (
+      <Linguagem
+        atual={progresso.linguagem}
+        onEscolher={escolherLinguagem}
+        onVoltar={progresso.linguagem ? () => setTela("perfil") : null}
+      />
+    );
+  }
+
+  if (tela === "aula") {
+    const track = trackDe(progresso.classe);
+    const ex = track.find((e) => e.id === exId) ?? track[0];
+    return (
+      <Aula
+        exercicio={ex}
+        linguagem={linguagemDoJogador(progresso)}
+        onConcluir={() => setTela("exercicio")}
+        onSair={() => setTela("dashboard")}
+      />
+    );
+  }
+
   if (tela === "perfil") {
     return (
       <Perfil
         progresso={progresso}
         onRenomear={renomear}
         onTrocarCaminho={() => setTela("entrada")}
+        onTrocarLinguagem={() => setTela("linguagem")}
         onResetar={resetar}
         onSair={sairConta}
         onVoltar={() => setTela("dashboard")}
@@ -273,6 +312,7 @@ function App() {
   if (tela === "nivelamento") {
     return (
       <Nivelamento
+        linguagem={linguagemDoJogador(progresso)}
         onConcluir={(rank) => nivelar(rank)}
         onSair={() => setTela("dashboard")}
       />
@@ -300,6 +340,7 @@ function App() {
         fraturado={fraturado}
         classe={progresso.classe}
         criador={ehCriador(progresso) && !comoJogador}
+        linguagem={linguagemDoJogador(progresso)}
         heroiCor={cosmetico(eq.cor).valor}
         heroiSeed={semente(progresso.classe || "Caçador")}
         heroi={{ cfg: configPersonagem(progresso), classe: progresso.classe || "O Arquiteto", equip: progresso.equip || {} }}

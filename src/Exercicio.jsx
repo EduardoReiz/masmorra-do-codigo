@@ -5,7 +5,8 @@ import BotaoVoltar from "./BotaoVoltar";
 import { RANKS } from "./dados/exercicios";
 import { AJUDA, linkAula } from "./dados/ajuda";
 import { LICOES, linkPesquisa } from "./dados/licoes";
-import { rodar, chamada, avaliarPrompt } from "./executa";
+import { executar, chamada, avaliarPrompt } from "./executa";
+import { starterDe } from "./dados/linguagens";
 import Batalha from "./Batalha";
 import ItemIcon from "./ItemIcon";
 import { sortearDrop, item as itemEquip, RARIDADES } from "./dados/equipamento";
@@ -32,7 +33,7 @@ function nivelAcima(nivel) {
 
 const LIMITE_RAPIDO_MS = 10000; // terminar antes disso = "rápido demais"
 
-export default function Exercicio({ exercicio, fraturado, classe, criador, heroiCor, heroiSeed, heroi, onSair, onVencer }) {
+export default function Exercicio({ exercicio, fraturado, classe, criador, linguagem, heroiCor, heroiSeed, heroi, onSair, onVencer }) {
   // moldes geram uma variação nova (prática infinita, sempre correta). O botão
   // "sortear outra" troca a semente. Exercício estático passa direto.
   const [seed, setSeed] = useState(() => (Date.now() ^ ((Math.random() * 1e9) | 0)) >>> 0);
@@ -46,7 +47,8 @@ export default function Exercicio({ exercicio, fraturado, classe, criador, heroi
   const xpGanho = ex.xp * (fraturado ? 2 : 1);
   const nivelMostrado = fraturado ? nivelAcima(ex.nivel) : ex.nivel;
 
-  const [codigo, setCodigo] = useState(ex.starter ?? "");
+  const lang = linguagem || { id: "js", nome: "JavaScript", monaco: "javascript" };
+  const [codigo, setCodigo] = useState(() => starterDe(ex, lang.id));
   const [saida, setSaida] = useState(null);
   const [venceu, setVenceu] = useState(false);
   const [flags, setFlags] = useState([]);
@@ -88,8 +90,8 @@ export default function Exercicio({ exercicio, fraturado, classe, criador, heroi
     }
   }
 
-  function enfrentar() {
-    const r = ehPrompt ? avaliarPrompt(codigo, ex.requisitos) : rodar(codigo, ex.fn, testes);
+  async function enfrentar() {
+    const r = ehPrompt ? avaliarPrompt(codigo, ex.requisitos) : await executar(lang.id, codigo, ex.fn, testes);
     setSaida(r);
     if (r.erro) return; // não compilou / prompt curto demais: só mostra o aviso
     const ok = r.resultados.length && r.resultados.every((x) => x.ok);
@@ -125,7 +127,7 @@ export default function Exercicio({ exercicio, fraturado, classe, criador, heroi
       setProva(true);
     } else {
       // monstro comum: técnica avançada além do nível? prove que entende
-      const perguntas = ehPrompt ? [] : analisarEstilo(codigo, ex.nivel);
+      const perguntas = ehPrompt || lang.id !== "js" ? [] : analisarEstilo(codigo, ex.nivel);
       if (perguntas.length) setProvaEstilo({ mc: perguntas });
       else setVenceu(true);
     }
@@ -257,7 +259,7 @@ export default function Exercicio({ exercicio, fraturado, classe, criador, heroi
         </section>
 
         <section className="ex-editor">
-          <div className="ex-editor-top" translate="no">{ehPrompt ? "SEU PROMPT" : "JavaScript"}</div>
+          <div className="ex-editor-top" translate="no">{ehPrompt ? "SEU PROMPT" : lang.nome}</div>
           <div className="ex-monaco">
             {ehPrompt ? (
               <textarea
@@ -272,7 +274,7 @@ export default function Exercicio({ exercicio, fraturado, classe, criador, heroi
             ) : (
               <Editor
                 height="100%"
-                defaultLanguage="javascript"
+                language={lang.monaco}
                 theme="vs-dark"
                 value={codigo}
                 onChange={(v) => setCodigo(v ?? "")}

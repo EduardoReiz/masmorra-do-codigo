@@ -3,6 +3,7 @@ import "./App.css";
 import { RankEmblema } from "./Emblema";
 import BotaoVoltar from "./BotaoVoltar";
 import { rankDoJogador } from "./dados/exercicios";
+import { linguagemDoJogador } from "./dados/linguagens";
 
 const NOME_METODO = {
   email: "E-mail",
@@ -13,7 +14,7 @@ const NOME_METODO = {
 };
 
 // Aba de Perfil / Configurações. Tudo local no protótipo.
-export default function Perfil({ progresso, onRenomear, onTrocarCaminho, onResetar, onSair, onVoltar }) {
+export default function Perfil({ progresso, onRenomear, onTrocarCaminho, onTrocarLinguagem, onResetar, onSair, onVoltar }) {
   const conta = progresso.conta || {};
   const [nome, setNome] = useState(conta.nome || "");
   const [confirmaReset, setConfirmaReset] = useState(false);
@@ -58,6 +59,12 @@ export default function Perfil({ progresso, onRenomear, onTrocarCaminho, onReset
             <span className="perfil-k">Caminho</span>
             <span className="perfil-v">{progresso.classe || "não escolhido"}</span>
           </div>
+          {progresso.classe === "O Arquiteto" && (
+            <div className="perfil-linha">
+              <span className="perfil-k">Linguagem</span>
+              <span className="perfil-v" translate="no">{linguagemDoJogador(progresso).nome}</span>
+            </div>
+          )}
           <div className="perfil-linha">
             <span className="perfil-k">Rank</span>
             <span className="perfil-v" translate="no"><RankEmblema rank={rank} tamanho={26} className="perfil-rank" />{rank}</span>
@@ -71,6 +78,9 @@ export default function Perfil({ progresso, onRenomear, onTrocarCaminho, onReset
             <span className="perfil-v" translate="no">{progresso.xp}</span>
           </div>
           <button className="perfil-btn" onClick={onTrocarCaminho}>Trocar de caminho</button>
+          {progresso.classe === "O Arquiteto" && (
+            <button className="perfil-btn" onClick={onTrocarLinguagem}>Trocar de linguagem</button>
+          )}
         </section>
 
         <section className="perfil-bloco perigo">

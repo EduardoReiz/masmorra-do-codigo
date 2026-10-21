@@ -4,7 +4,7 @@
 // O RANK agora é calculado por competência em dados/exercicios.js (rankDe):
 // não mora mais aqui, porque depende de quais chefes foram vencidos.
 const CHAVE = "masmorra.progresso.v1";
-const PADRAO = { xp: 0, derrotados: [], classe: null, despertou: false, itens: [], suspeitos: [], nivelado: false, avatar: null, conta: null, itensEquip: [], equip: {}, avisos: 0, sequencia: 0, melhorSequencia: 0, ultimoDia: null, subclasse: null, subclasseOferecida: false, personagem: null };
+const PADRAO = { linguagem: null, xp: 0, derrotados: [], classe: null, despertou: false, itens: [], suspeitos: [], nivelado: false, avatar: null, conta: null, itensEquip: [], equip: {}, avisos: 0, sequencia: 0, melhorSequencia: 0, ultimoDia: null, subclasse: null, subclasseOferecida: false, personagem: null };
 
 function arr(x) {
   return Array.isArray(x) ? x : [];

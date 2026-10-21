@@ -3,14 +3,16 @@ import Editor from "@monaco-editor/react";
 import "./App.css";
 import BotaoVoltar from "./BotaoVoltar";
 import { NIVELAMENTO } from "./dados/nivelamento";
-import { rodar, chamada } from "./executa";
+import { executar, chamada } from "./executa";
+import { starterDe } from "./dados/linguagens";
 
 // Teste de Nivelamento adaptativo: o jogador sobe enquanto acerta. Acertar uma
 // questão avança para a próxima (mais difícil); o rank final é o da última
 // questão vencida. Encerrar a qualquer momento classifica pelo que já provou.
-export default function Nivelamento({ onConcluir, onSair }) {
+export default function Nivelamento({ linguagem, onConcluir, onSair }) {
+  const lang = linguagem || { id: "js", nome: "JavaScript", monaco: "javascript" };
   const [idx, setIdx] = useState(0);
-  const [codigo, setCodigo] = useState(NIVELAMENTO[0].starter);
+  const [codigo, setCodigo] = useState(() => starterDe(NIVELAMENTO[0], lang.id));
   const [saida, setSaida] = useState(null);
   const [passouAte, setPassouAte] = useState("E"); // rank já provado
   const [fim, setFim] = useState(false);
@@ -19,17 +21,17 @@ export default function Nivelamento({ onConcluir, onSair }) {
   const q = NIVELAMENTO[idx];
 
   useEffect(() => {
-    setCodigo(q.starter);
+    setCodigo(starterDe(q, lang.id));
     setSaida(null);
-  }, [idx, q.starter]);
+  }, [idx, q, lang.id]);
 
   function encerrar(rank) {
     setRankFinal(rank);
     setFim(true);
   }
 
-  function enviar() {
-    const r = rodar(codigo, q.fn, q.testes);
+  async function enviar() {
+    const r = await executar(lang.id, codigo, q.fn, q.testes);
     setSaida(r);
     if (!r.erro && r.resultados.length && r.resultados.every((x) => x.ok)) {
       const novo = q.classificaEm;
@@ -95,11 +97,11 @@ export default function Nivelamento({ onConcluir, onSair }) {
         </section>
 
         <section className="ex-editor">
-          <div className="ex-editor-top" translate="no">JavaScript</div>
+          <div className="ex-editor-top" translate="no">{lang.nome}</div>
           <div className="ex-monaco">
             <Editor
               height="100%"
-              defaultLanguage="javascript"
+              language={lang.monaco}
               theme="vs-dark"
               value={codigo}
               onChange={(v) => setCodigo(v ?? "")}
