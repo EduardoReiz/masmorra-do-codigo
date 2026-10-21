@@ -5,7 +5,7 @@ import BotaoVoltar from "./BotaoVoltar";
 import Servo from "./Servo";
 import { aulaDe } from "./dados/aulas";
 import { fala } from "./dados/servo";
-import { executar, executarPrograma, chamada } from "./executa";
+import { executar, executarPrograma, avaliarPrompt, chamada } from "./executa";
 
 // A aula que vem ANTES do combate: conceito -> demonstração do Criador -> guiado.
 // É obrigatória: só dá para enfrentar o monstro depois de completar o guiado.
@@ -102,7 +102,7 @@ function Conceito({ aula, linguagem, onSeguir }) {
         ))}
       </div>
 
-      <h2 className="aula-h2">Como se escreve em {linguagem.nome}</h2>
+      <h2 className="aula-h2">{aula.tituloSintaxe || `Como se escreve em ${linguagem.nome}`}</h2>
       <ul className="aula-sintaxe">
         {aula.sintaxe.map((s) => (
           <li key={s.trecho}>
@@ -120,6 +120,7 @@ function Conceito({ aula, linguagem, onSeguir }) {
 // ---- 2. Demonstração: o Criador resolve, passo a passo --------------------
 function Demonstracao({ aula, exercicio, onFala, onVoltar, onSeguir }) {
   const { codigo, passos, entrada, ritmo } = aula.demo;
+  const ehPrompt = aula.demo.tipo === "prompt";
   const passoMs = ritmo || PASSO_PADRAO_MS;
   const [i, setI] = useState(0);
   const [tocando, setTocando] = useState(true);
@@ -162,14 +163,25 @@ function Demonstracao({ aula, exercicio, onFala, onVoltar, onSeguir }) {
       <div className="aula-sub" translate="no">O CRIADOR RESOLVE · {entrada}</div>
 
       <div className="aula-demo-grid">
-        <div className="aula-codigo" translate="no">
-          {codigo.map((linha, n) => (
-            <div key={n} className={"aula-linha" + (n === passo.linha ? " ativa" : "")}>
-              <span className="aula-num">{n + 1}</span>
-              <pre>{linha || " "}</pre>
-            </div>
-          ))}
-        </div>
+        {ehPrompt ? (
+          <div className="aula-prompt">
+            <div className="aula-tela-titulo" translate="no">O PROMPT QUE O CRIADOR ESCREVE</div>
+            <p className="aula-prompt-texto">
+              {passo.texto.slice(0, passo.texto.length - (passo.novo || "").length)}
+              {passo.novo && <mark>{passo.novo}</mark>}
+              {!passo.texto && <em className="aula-prompt-vazio">(ainda em branco)</em>}
+            </p>
+          </div>
+        ) : (
+          <div className="aula-codigo" translate="no">
+            {codigo.map((linha, n) => (
+              <div key={n} className={"aula-linha" + (n === passo.linha ? " ativa" : "")}>
+                <span className="aula-num">{n + 1}</span>
+                <pre>{linha || " "}</pre>
+              </div>
+            ))}
+          </div>
+        )}
 
         <div className="aula-palco">
           <div className="aula-palco-cena">
@@ -187,7 +199,17 @@ function Demonstracao({ aula, exercicio, onFala, onVoltar, onSeguir }) {
             </div>
           </div>
 
-          {passo.vars.length > 0 && (
+          {ehPrompt && (
+            <div className="aula-checklist">
+              <div className="aula-vars-titulo" translate="no">O QUE O PROMPT PRECISA TER</div>
+              {aula.demo.requisitos.map((nome, n) => (
+                <div key={nome} className={"aula-check" + (passo.atende[n] ? " ok" : "")}>
+                  <b>{passo.atende[n] ? "✓" : "○"}</b> {nome}
+                </div>
+              ))}
+            </div>
+          )}
+          {!ehPrompt && passo.vars.length > 0 && (
             <div className="aula-vars" translate="no">
               <div className="aula-vars-titulo">VARIÁVEIS</div>
               {passo.vars.map(([nome, valor]) => (
@@ -230,6 +252,7 @@ function Guiado({ aula, exercicio, linguagem, onFala, onVoltar, onConcluir }) {
   const [rodando, setRodando] = useState(false);
   const [passou, setPassou] = useState(false);
   const ehPrograma = exercicio.modo === "programa";
+  const ehPrompt = exercicio.tipo === "prompt";
   const testes = aula.guiado.testes || [];
 
   useEffect(() => { onFala("guiado", "neutro"); }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -241,9 +264,11 @@ function Guiado({ aula, exercicio, linguagem, onFala, onVoltar, onConcluir }) {
       return;
     }
     setRodando(true);
-    const r = ehPrograma
-      ? await executarPrograma(linguagem.id, codigo, exercicio.saida, exercicio.exige)
-      : await executar(linguagem.id, codigo, exercicio.fn, testes);
+    const r = ehPrompt
+      ? avaliarPrompt(codigo, exercicio.requisitos)
+      : ehPrograma
+        ? await executarPrograma(linguagem.id, codigo, exercicio.saida, exercicio.exige)
+        : await executar(linguagem.id, codigo, exercicio.fn, testes);
     setRodando(false);
     setSaida(r);
     const ok = !r.erro && r.resultados.length && r.resultados.every((x) => x.ok);
@@ -259,22 +284,44 @@ function Guiado({ aula, exercicio, linguagem, onFala, onVoltar, onConcluir }) {
 
   return (
     <div className="aula-cartao aula-guiado">
-      <div className="aula-sub" translate="no">SUA VEZ · {aula.guiado.starter.includes("___") ? "PREENCHA AS LACUNAS" : "ESCREVA O CÓDIGO"}</div>
+      <div className="aula-sub" translate="no">SUA VEZ · {aula.guiado.starter.includes("___") ? "PREENCHA AS LACUNAS" : ehPrompt ? "ESCREVA O PROMPT" : "ESCREVA O CÓDIGO"}</div>
       <p className="aula-texto">
-        É a mesma solução que o Criador fez. Troque cada <code>___</code> pelo que falta e envie.
+        {ehPrompt ? "É o mesmo prompt que o Criador montou, com lacunas." : "É a mesma solução que o Criador fez."} Troque cada <code>___</code> pelo que falta e envie.
       </p>
 
-      <div className="aula-editor">
-        <EditorAuto
-          min={120}
-          max={420}
-          language={linguagem.monaco}
+      {ehPrompt ? (
+        <textarea
+          className="ex-prompt aula-prompt-edicao"
           value={codigo}
-          onChange={(v) => setCodigo(v ?? "")}
+          onChange={(e) => setCodigo(e.target.value)}
+          rows={8}
+          spellCheck={false}
         />
-      </div>
+      ) : (
+        <div className="aula-editor">
+          <EditorAuto
+            min={120}
+            max={420}
+            language={linguagem.monaco}
+            value={codigo}
+            onChange={(v) => setCodigo(v ?? "")}
+          />
+        </div>
+      )}
 
-      {ehPrograma ? (
+      {ehPrompt ? (
+        <ul className="ex-casos ex-requisitos aula-casos">
+          {(saida?.resultados?.length ? saida.resultados : exercicio.requisitos).map((r, i) => {
+            const avaliado = "ok" in r;
+            return (
+              <li key={i} className={avaliado ? (r.ok ? "ok" : "fail") : ""}>
+                {avaliado && <b>{r.ok ? "✓ " : "✗ "}</b>}
+                {r.nome}
+              </li>
+            );
+          })}
+        </ul>
+      ) : ehPrograma ? (
         <div className="ex-tela aula-casos" translate="no">
           <div className="aula-tela-titulo">O QUE DEVE APARECER NA TELA</div>
           <pre>{exercicio.saida}</pre>
@@ -304,7 +351,7 @@ function Guiado({ aula, exercicio, linguagem, onFala, onVoltar, onConcluir }) {
       {saida?.erro && <div className="ex-erro">{saida.erro}</div>}
       {saida && !saida.erro && (
         <div className={"ex-resultado " + (totalOk === saida.resultados.length ? "ok" : "fail")}>
-          {totalOk} de {saida.resultados.length} {ehPrograma ? "requisitos atendidos" : "testes passaram"}
+          {totalOk} de {saida.resultados.length} {ehPrograma || ehPrompt ? "requisitos atendidos" : "testes passaram"}
         </div>
       )}
 

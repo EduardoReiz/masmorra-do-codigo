@@ -1,4 +1,4 @@
-// Gera src/dados/aulas.arquiteto.js a partir de licoes/*.mjs.
+// Gera src/dados/aulas.geradas.js a partir de licoes/*.mjs.
 //
 //   node ferramentas/aulas/gerar.mjs
 //
@@ -21,12 +21,20 @@ const raiz = path.join(aqui, "..", "..");
 // ---- testes oficiais dos monstros (o código do jogo, empacotado pelo esbuild) ----
 const tmp = mkdtempSync(path.join(tmpdir(), "oficiais-"));
 const entrada = path.join(tmp, "entrada.mjs");
-writeFileSync(entrada, `export { EXERCICIOS } from ${JSON.stringify(path.join(raiz, "src/dados/exercicios.js"))};\nexport { instanciar } from ${JSON.stringify(path.join(raiz, "src/dados/gerador.js"))};\n`);
+writeFileSync(
+  entrada,
+  `export { EXERCICIOS } from ${JSON.stringify(path.join(raiz, "src/dados/exercicios.js"))};\n` +
+    `export { instanciar } from ${JSON.stringify(path.join(raiz, "src/dados/gerador.js"))};\n` +
+    `export { SENTINELA } from ${JSON.stringify(path.join(raiz, "src/dados/tracks/sentinela.js"))};\n` +
+    `export { ESTRATEGISTA } from ${JSON.stringify(path.join(raiz, "src/dados/tracks/estrategista.js"))};\n` +
+    `export { ORACULO } from ${JSON.stringify(path.join(raiz, "src/dados/tracks/oraculo.js"))};\n`
+);
 const pacote = path.join(tmp, "oficiais.mjs");
 execFileSync("npx", ["--yes", "esbuild", entrada, "--bundle", "--platform=node", "--format=esm", `--outfile=${pacote}`, "--log-level=error"], { cwd: raiz });
-const { EXERCICIOS, instanciar } = await import(pathToFileURL(pacote).href);
+const { EXERCICIOS, instanciar, SENTINELA, ESTRATEGISTA, ORACULO } = await import(pathToFileURL(pacote).href);
+const TODOS = [...EXERCICIOS, ...SENTINELA, ...ESTRATEGISTA, ...ORACULO];
 const oficiais = (id) => {
-  const ex = EXERCICIOS.find((e) => e.id === id);
+  const ex = TODOS.find((e) => e.id === id);
   if (!ex) throw new Error(`monstro desconhecido: ${id}`);
   const inst = instanciar(ex, 20261021);
   return [...inst.testes, ...(inst.fratura || [])].map((t) => ({ in: t.in, out: t.out }));
@@ -134,7 +142,7 @@ function monta(licao, lang, dados, eventosBrutos, retornoFmt) {
     });
     passos.push({
       linha: e.linha,
-      vars: ordem.filter((n) => n in depois).map((n) => [n, fmt(depois[n])]),
+      vars: ordem.filter((n) => n in depois).map((n) => [n, licao.rotulos?.[n] ?? fmt(depois[n])]),
       // na última linha a saída é a completa (já conferida contra licao.saida); antes, a que o rastreio viu
       ...(programa ? { saida: (k + 1 >= eventos.length ? licao.saida : String(depois.__saida ?? "")).replace(/\n$/, "") } : {}),
       fala,
@@ -148,6 +156,42 @@ function monta(licao, lang, dados, eventosBrutos, retornoFmt) {
   return { codigo, passos };
 }
 
+// ---- lições de prompt (Oráculo) ----------------------------------------------------
+// O prompt é montado em etapas ("acrescenta"); a cada etapa o gerador roda a rubrica REAL do
+// monstro (os mesmos requisitos que o jogo usa para corrigir) e marca quais já foram atendidos.
+function geraPrompt(licao) {
+  const ex = TODOS.find((e) => e.id === licao.id);
+  if (!ex || ex.tipo !== "prompt") throw new Error(`${licao.id}: não é um monstro de prompt`);
+  const nomes = ex.requisitos.map((r) => r.nome);
+  const avalia = (t) => ex.requisitos.map((r) => !!r.ok(t));
+  let texto = "";
+  let anteriores = 0;
+  const passos = [];
+  if (licao.abertura) passos.push({ linha: -1, vars: [], texto: "", novo: "", atende: nomes.map(() => false), fala: licao.abertura });
+  for (const p of licao.passos) {
+    texto += p.acrescenta;
+    const atende = avalia(texto);
+    const total = atende.filter(Boolean).length;
+    passos.push({ linha: -1, vars: [], texto, novo: p.acrescenta, atende, fala: p.fala, ...(total > anteriores ? { dano: true } : {}) });
+    anteriores = total;
+  }
+  const ultimo = passos[passos.length - 1];
+  if (!ultimo.atende.every(Boolean)) throw new Error(`${licao.id}: o prompt final da demonstração não atende a todos os requisitos: ${nomes.filter((_, i) => !ultimo.atende[i]).join("; ")}`);
+  if (!passos.some((p) => p.dano)) throw new Error(`${licao.id}: nenhum passo cumpriu um requisito`);
+  passos.push({ ...ultimo, novo: "", fala: licao.fimFala || "O prompt atende a tudo. O monstro caiu.", fim: true, dano: undefined });
+  delete passos[passos.length - 1].dano;
+  // guiado: preenchido, também passa na rubrica
+  let i = 0;
+  const preenchido = licao.guiado.codigo.replace(/___/g, () => licao.guiado.preenche[i++]);
+  if (i !== licao.guiado.preenche.length) throw new Error(`${licao.id}: o guiado tem ${i} lacunas e ${licao.guiado.preenche.length} respostas`);
+  const falhou = avalia(preenchido).map((ok, k) => (ok ? null : nomes[k])).filter(Boolean);
+  if (falhou.length) throw new Error(`${licao.id}: o guiado preenchido não atende a: ${falhou.join("; ")}`);
+  return {
+    conceito: licao.conceito, porque: licao.porque, analogia: licao.analogia, ideias: licao.ideias, tituloSintaxe: licao.tituloSintaxe || "O que um bom prompt precisa ter",
+    linguagens: { js: { sintaxe: licao.dicas, demo: { tipo: "prompt", entrada: licao.rotulo || "o prompt", codigo: [], requisitos: nomes, passos, ...(licao.ritmo ? { ritmo: licao.ritmo } : {}) }, guiado: { starter: licao.guiado.codigo } } },
+  };
+}
+
 // ---- principal ------------------------------------------------------------------
 const arquivos = readdirSync(path.join(aqui, "licoes")).filter((f) => f.endsWith(".mjs")).sort();
 const licoes = [];
@@ -155,9 +199,10 @@ for (const a of arquivos) licoes.push(...(await import(pathToFileURL(path.join(a
 
 const saida = {};
 for (const licao of licoes) {
+  if (licao.modo === "prompt") { saida[licao.id] = geraPrompt(licao); console.log(`ok  ${licao.id.padEnd(12)} prompt  ${saida[licao.id].linguagens.js.demo.passos.length} passos`); continue; }
   const testesOficiais = licao.modo === "programa" ? [] : oficiais(licao.id);
   const linguagens = {};
-  for (const lang of ["js", "py"]) {
+  for (const lang of ["js", "py"].filter((l) => licao[l])) {
     const d = licao[lang];
     const codigoTexto = d.codigo.map(([t]) => t).join("\n");
     const pre = d.preambulo || "";
@@ -204,12 +249,12 @@ for (const licao of licoes) {
   saida[licao.id] = { conceito: licao.conceito, porque: licao.porque, analogia: licao.analogia, ideias: licao.ideias, linguagens };
 }
 
-const alvo = path.join(raiz, "src/dados/aulas.arquiteto.js");
+const alvo = path.join(raiz, "src/dados/aulas.geradas.js");
 writeFileSync(
   alvo,
   `// GERADO por ferramentas/aulas/gerar.mjs a partir de ferramentas/aulas/licoes/*.mjs. Não edite à mão.\n` +
     `// As demonstrações vêm da execução real do código (valores das variáveis a cada linha), e as\n` +
     `// soluções foram conferidas contra os testes oficiais dos monstros, em JavaScript e em Python.\n` +
-    `export const AULAS_ARQUITETO = ${JSON.stringify(saida, null, 2)};\n`
+    `export const AULAS_GERADAS = ${JSON.stringify(saida, null, 2)};\n`
 );
-console.log(`\n${Object.keys(saida).length} aulas gravadas em src/dados/aulas.arquiteto.js`);
+console.log(`\n${Object.keys(saida).length} aulas gravadas em src/dados/aulas.geradas.js`);

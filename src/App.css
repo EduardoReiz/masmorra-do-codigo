@@ -3248,3 +3248,15 @@ body.sem-cursor {
 /* o editor começa pequeno e cresce conforme o código (EditorAuto) */
 .ex-monaco.auto { flex: none; min-height: 0; }
 .editor-auto { transition: height 0.12s ease; }
+
+/* aula de prompt (Oráculo): o prompt cresce e a lista de requisitos vai sendo cumprida */
+.aula-prompt { background: #060a14; border: 1px solid #141e34; border-radius: 10px; padding: 14px 16px; min-height: 240px; }
+.aula-prompt-texto { margin: 8px 0 0; font-size: 15px; line-height: 1.75; color: #cfd8ef; white-space: pre-wrap; }
+.aula-prompt-texto mark { background: rgba(11, 238, 245, 0.18); color: #eafcff; border-radius: 4px; padding: 1px 2px; }
+.aula-prompt-vazio { color: #4a5876; }
+.aula-checklist { padding: 10px 12px; background: #0e1426; border: 1px solid #1c2842; border-radius: 10px; }
+.aula-check { display: flex; gap: 8px; padding: 5px 0; font-size: 13px; color: #6f7ea3; border-bottom: 1px dashed #1c2842; }
+.aula-check b { width: 16px; color: #3a4666; }
+.aula-check.ok { color: #cfe9ff; }
+.aula-check.ok b { color: #35e08a; }
+.aula-prompt-edicao { width: 100%; min-height: 160px; }

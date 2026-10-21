@@ -14,10 +14,10 @@
 //   linguagens: { js|py: { sintaxe[{trecho,explica}],
 //                          demo:{ entrada, codigo[], passos[{linha,vars,fala,dano?,fim?}] },
 //                          guiado:{ starter, lacunas[], testes[{in,out}] } } }
-import { AULAS_ARQUITETO } from "./aulas.arquiteto";
+import { AULAS_GERADAS } from "./aulas.geradas";
 
 export const AULAS = {
-  ...AULAS_ARQUITETO, // geradas por ferramentas/aulas/gerar.mjs (execução real do código)
+  ...AULAS_GERADAS, // geradas por ferramentas/aulas/gerar.mjs (execução real do código)
   soma: {
     conceito: "Repetir uma tarefa sem copiar e colar: o laço",
     porque:

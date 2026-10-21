@@ -1,7 +1,7 @@
 // GERADO por ferramentas/aulas/gerar.mjs a partir de ferramentas/aulas/licoes/*.mjs. Não edite à mão.
 // As demonstrações vêm da execução real do código (valores das variáveis a cada linha), e as
 // soluções foram conferidas contra os testes oficiais dos monstros, em JavaScript e em Python.
-export const AULAS_ARQUITETO = {
+export const AULAS_GERADAS = {
   "oi": {
     "conceito": "Mostrar um texto na tela: o seu primeiro programa",
     "porque": "Todo programa é uma lista de ordens que o computador executa uma por vez, de cima para baixo. A primeira ordem que quase todo mundo aprende é mostrar uma mensagem na tela. É o famoso 'Olá, mundo' da programação, e aqui ele vira 'Oi, Criador!'.",
@@ -8762,6 +8762,4489 @@ export const AULAS_ARQUITETO = {
               "out": ""
             }
           ]
+        }
+      }
+    }
+  },
+  "sec-xss": {
+    "conceito": "Nunca confie na entrada: escape o que é perigoso",
+    "porque": "Quando um site mostra um texto digitado por alguém, o navegador pode entender partes dele como código. Um atacante escreve <script> num comentário e, se o site não tratar, o código roda no navegador de quem ler. A defesa é escapar: trocar os caracteres especiais por versões inofensivas, que aparecem como texto.",
+    "analogia": "É como passar a correspondência por um detector antes de abrir: carta é carta, mas o que parecer uma ordem escondida é neutralizado. Aqui, os símbolos que dariam ordens ao navegador viram símbolos que só aparecem na tela.",
+    "ideias": [
+      {
+        "titulo": "XSS",
+        "texto": "Ataque em que um texto malicioso vira código na página de outras pessoas. Nasce de confiar no que o usuário digita."
+      },
+      {
+        "titulo": "Escapar",
+        "texto": "Trocar < por &lt;, > por &gt; e & por &amp;. O navegador mostra o símbolo, mas não o interpreta como comando."
+      },
+      {
+        "titulo": "A ordem importa",
+        "texto": "O & vem primeiro: se ele fosse trocado depois, o & dos códigos novos (&lt;, &gt;) também seria alterado e tudo quebraria."
+      }
+    ],
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "let seguro = texto.replaceAll(\"&\", \"&amp;\");",
+            "explica": "replaceAll(procurar, trocarPor) devolve um texto novo com TODAS as ocorrências trocadas. O texto original não muda, por isso guardamos o resultado numa variável (let, porque ela vai mudar nas próximas linhas)."
+          },
+          {
+            "trecho": "seguro = seguro.replaceAll(\"<\", \"&lt;\");",
+            "explica": "Aqui a variável já existe (sem let) e recebe o resultado da nova troca, partindo do que já tinha sido trocado. Cada linha corrige mais um caractere perigoso."
+          },
+          {
+            "trecho": "return seguro;",
+            "explica": "Devolve o texto já tratado. Quem chamar a função usa essa versão na página, nunca a original."
+          }
+        ],
+        "demo": {
+          "entrada": "sanitizarHtml(\"<b>E&M</b>\")",
+          "codigo": [
+            "function sanitizarHtml(texto) {",
+            "  let seguro = texto.replaceAll(\"&\", \"&amp;\");",
+            "  seguro = seguro.replaceAll(\"<\", \"&lt;\");",
+            "  seguro = seguro.replaceAll(\">\", \"&gt;\");",
+            "  return seguro;",
+            "}"
+          ],
+          "passos": [
+            {
+              "linha": 0,
+              "vars": [
+                [
+                  "texto",
+                  "\"<b>E&M</b>\""
+                ]
+              ],
+              "fala": "O Criador chama sanitizarHtml(\"<b>E&M</b>\"). Se esse texto fosse direto para a página, o navegador leria o <b> como código."
+            },
+            {
+              "linha": 1,
+              "vars": [
+                [
+                  "texto",
+                  "\"<b>E&M</b>\""
+                ],
+                [
+                  "seguro",
+                  "\"<b>E&amp;M</b>\""
+                ]
+              ],
+              "fala": "Primeiro troca o & por &amp;. Se trocasse o < e o > antes, o & dos códigos novos (&lt; e &gt;) seria trocado de novo. Agora: \"<b>E&amp;M</b>\".",
+              "dano": true
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "texto",
+                  "\"<b>E&M</b>\""
+                ],
+                [
+                  "seguro",
+                  "\"&lt;b>E&amp;M&lt;/b>\""
+                ]
+              ],
+              "fala": "Troca cada < por &lt;. Agora: \"&lt;b>E&amp;M&lt;/b>\".",
+              "dano": true
+            },
+            {
+              "linha": 3,
+              "vars": [
+                [
+                  "texto",
+                  "\"<b>E&M</b>\""
+                ],
+                [
+                  "seguro",
+                  "\"&lt;b&gt;E&amp;M&lt;/b&gt;\""
+                ]
+              ],
+              "fala": "Troca cada > por &gt;. Agora: \"&lt;b&gt;E&amp;M&lt;/b&gt;\". Não sobrou nenhum < ou > cru.",
+              "dano": true
+            },
+            {
+              "linha": 4,
+              "vars": [
+                [
+                  "texto",
+                  "\"<b>E&M</b>\""
+                ],
+                [
+                  "seguro",
+                  "\"&lt;b&gt;E&amp;M&lt;/b&gt;\""
+                ]
+              ],
+              "fala": "return devolve o texto seguro: \"&lt;b&gt;E&amp;M&lt;/b&gt;\". O navegador mostra isso como texto, em vez de executar como código."
+            },
+            {
+              "linha": 4,
+              "vars": [
+                [
+                  "texto",
+                  "\"<b>E&M</b>\""
+                ],
+                [
+                  "seguro",
+                  "\"&lt;b&gt;E&amp;M&lt;/b&gt;\""
+                ]
+              ],
+              "fala": "Os testes passaram. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "function sanitizarHtml(texto) {\n  let seguro = texto.replaceAll(\"&\", ___);     // por qual código trocar o &? (comece sempre por ele)\n  seguro = seguro.replaceAll(___, \"&lt;\");     // qual símbolo vira &lt;?\n  seguro = seguro.replaceAll(\">\", ___);        // por qual código trocar o >?\n  return ___;                                  // o que devolver?\n}\n",
+          "testes": [
+            {
+              "in": [
+                "<script>"
+              ],
+              "out": "&lt;script&gt;"
+            },
+            {
+              "in": [
+                "a & b"
+              ],
+              "out": "a &amp; b"
+            },
+            {
+              "in": [
+                "ola"
+              ],
+              "out": "ola"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "sec-senha": {
+    "conceito": "Validar a entrada com regras claras",
+    "porque": "Senha curta ou só de números é fácil de adivinhar. Em vez de confiar que o usuário escolheu bem, o programa confere regras objetivas: tamanho mínimo, pelo menos uma letra e pelo menos um número. Cada regra vira uma pergunta de sim ou não, e a senha só passa se todas as respostas forem sim.",
+    "analogia": "É como o segurança de uma festa conferindo três itens na entrada: convite, documento e pulseira. Se faltar um deles, não entra. Cada item é uma pergunta de sim ou não, e todos precisam ser sim.",
+    "ideias": [
+      {
+        "titulo": "Regra = pergunta de sim ou não",
+        "texto": "Cada exigência da senha vira uma condição que dá true ou false."
+      },
+      {
+        "titulo": "Expressão regular",
+        "texto": "Um padrão que descreve que tipo de texto procurar, como 'alguma letra' ou 'algum número'."
+      },
+      {
+        "titulo": "E lógico (&&)",
+        "texto": "Só dá true quando TODAS as condições ligadas por ele são verdadeiras."
+      }
+    ],
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "const compridaAbastante = senha.length >= 8;",
+            "explica": "length é o tamanho do texto. O sinal >= pergunta 'é maior ou igual a'. O resultado é true ou false e fica guardado na variável."
+          },
+          {
+            "trecho": "const temLetra = /[a-zA-Z]/.test(senha);",
+            "explica": "Entre as barras / / fica um padrão (expressão regular). [a-zA-Z] significa 'qualquer letra de a até z, minúscula ou maiúscula'. O .test(senha) pergunta se o padrão aparece em algum lugar da senha e responde true ou false."
+          },
+          {
+            "trecho": "const temNumero = /[0-9]/.test(senha);",
+            "explica": "Mesma ideia: [0-9] é 'qualquer dígito de 0 a 9'."
+          },
+          {
+            "trecho": "return compridaAbastante && temLetra && temNumero;",
+            "explica": "&& é o E lógico: só é true quando as três respostas são true. Se uma falhar, a senha é recusada."
+          }
+        ],
+        "demo": {
+          "entrada": "senhaForte(\"abcd1234\")",
+          "codigo": [
+            "function senhaForte(senha) {",
+            "  const compridaAbastante = senha.length >= 8;",
+            "  const temLetra = /[a-zA-Z]/.test(senha);",
+            "  const temNumero = /[0-9]/.test(senha);",
+            "  return compridaAbastante && temLetra && temNumero;",
+            "}"
+          ],
+          "passos": [
+            {
+              "linha": 0,
+              "vars": [
+                [
+                  "senha",
+                  "\"abcd1234\""
+                ]
+              ],
+              "fala": "O Criador chama senhaForte(\"abcd1234\"). Vai conferir três regras, uma por vez."
+            },
+            {
+              "linha": 1,
+              "vars": [
+                [
+                  "senha",
+                  "\"abcd1234\""
+                ],
+                [
+                  "compridaAbastante",
+                  "true"
+                ]
+              ],
+              "fala": "A senha tem pelo menos 8 caracteres? A resposta é true.",
+              "dano": true
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "senha",
+                  "\"abcd1234\""
+                ],
+                [
+                  "compridaAbastante",
+                  "true"
+                ],
+                [
+                  "temLetra",
+                  "true"
+                ]
+              ],
+              "fala": "Tem pelo menos uma letra? O padrão [a-zA-Z] procura qualquer letra. Resposta: true.",
+              "dano": true
+            },
+            {
+              "linha": 3,
+              "vars": [
+                [
+                  "senha",
+                  "\"abcd1234\""
+                ],
+                [
+                  "compridaAbastante",
+                  "true"
+                ],
+                [
+                  "temLetra",
+                  "true"
+                ],
+                [
+                  "temNumero",
+                  "true"
+                ]
+              ],
+              "fala": "Tem pelo menos um número? O padrão [0-9] procura qualquer dígito. Resposta: true.",
+              "dano": true
+            },
+            {
+              "linha": 4,
+              "vars": [
+                [
+                  "senha",
+                  "\"abcd1234\""
+                ],
+                [
+                  "compridaAbastante",
+                  "true"
+                ],
+                [
+                  "temLetra",
+                  "true"
+                ],
+                [
+                  "temNumero",
+                  "true"
+                ]
+              ],
+              "fala": "O && só dá true se as três respostas forem true. Aqui o resultado é true: a senha é forte."
+            },
+            {
+              "linha": 4,
+              "vars": [
+                [
+                  "senha",
+                  "\"abcd1234\""
+                ],
+                [
+                  "compridaAbastante",
+                  "true"
+                ],
+                [
+                  "temLetra",
+                  "true"
+                ],
+                [
+                  "temNumero",
+                  "true"
+                ]
+              ],
+              "fala": "Os testes passaram. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "function senhaForte(senha) {\n  const compridaAbastante = senha.length >= ___;      // quantos caracteres no mínimo?\n  const temLetra = /[a-zA-Z]/.test(___);             // o que testar?\n  const temNumero = /[0-9]/.___(senha);              // qual método testa o padrão?\n  return compridaAbastante ___ temLetra && temNumero;   // qual operador exige as duas?\n}\n",
+          "testes": [
+            {
+              "in": [
+                "abc"
+              ],
+              "out": false
+            },
+            {
+              "in": [
+                "abcd1234"
+              ],
+              "out": true
+            },
+            {
+              "in": [
+                "12345678"
+              ],
+              "out": false
+            },
+            {
+              "in": [
+                "abcdefgh"
+              ],
+              "out": false
+            }
+          ]
+        }
+      }
+    }
+  },
+  "sec-exame-e": {
+    "conceito": "Validar o formato com uma expressão regular",
+    "porque": "Um e-mail precisa ter a forma algo@algo.algo, sem espaços. Em vez de escrever várias comparações à mão, descrevemos essa forma num padrão e perguntamos se o texto combina com ele. Validar o formato antes de usar a informação é uma defesa básica contra entradas malformadas e maliciosas.",
+    "analogia": "É como um gabarito furado: você encosta o gabarito na folha e só passa se cada parte do texto encaixar nos buracos, na ordem certa: nome, arroba, domínio, ponto, final.",
+    "ideias": [
+      {
+        "titulo": "Padrão de formato",
+        "texto": "A expressão regular descreve a 'forma' do texto: o que vem antes e depois do @ e onde precisa haver um ponto."
+      },
+      {
+        "titulo": "Âncoras ^ e $",
+        "texto": "^ marca o começo e $ marca o fim: o texto INTEIRO precisa combinar, e não só um pedaço."
+      },
+      {
+        "titulo": "Várias regras",
+        "texto": "Uma regra simples (sem espaços) e uma de formato, ligadas por &&."
+      }
+    ],
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "const semEspaco = !email.includes(\" \");",
+            "explica": "includes(\" \") pergunta se o e-mail contém um espaço. O ! na frente inverte a resposta: queremos true quando NÃO tem espaço."
+          },
+          {
+            "trecho": "const formato = /^[^@]+@[^@]+\\.[^@]+$/.test(email);",
+            "explica": "Leia por partes: ^ começo; [^@]+ um ou mais caracteres que não são @ (o usuário); @ a arroba; [^@]+ o domínio; \\. um ponto de verdade (a barra tira o poder especial do ponto); [^@]+ o final; $ fim. Se o texto não encaixar, .test devolve false."
+          },
+          {
+            "trecho": "return semEspaco && formato;",
+            "explica": "Só é válido se as duas regras forem verdadeiras ao mesmo tempo."
+          }
+        ],
+        "demo": {
+          "entrada": "ehEmailValido(\"user@site.com\")",
+          "codigo": [
+            "function ehEmailValido(email) {",
+            "  const semEspaco = !email.includes(\" \");",
+            "  const formato = /^[^@]+@[^@]+\\.[^@]+$/.test(email);",
+            "  return semEspaco && formato;",
+            "}"
+          ],
+          "passos": [
+            {
+              "linha": 0,
+              "vars": [
+                [
+                  "email",
+                  "\"user@site.com\""
+                ]
+              ],
+              "fala": "O Criador chama ehEmailValido(\"user@site.com\"). Duas regras: sem espaços e no formato certo."
+            },
+            {
+              "linha": 1,
+              "vars": [
+                [
+                  "email",
+                  "\"user@site.com\""
+                ],
+                [
+                  "semEspaco",
+                  "true"
+                ]
+              ],
+              "fala": "Confere que não há espaço no e-mail. O resultado é true.",
+              "dano": true
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "email",
+                  "\"user@site.com\""
+                ],
+                [
+                  "semEspaco",
+                  "true"
+                ],
+                [
+                  "formato",
+                  "true"
+                ]
+              ],
+              "fala": "O padrão exige: algo, um @, algo, um ponto e algo no final. O e-mail combina? true.",
+              "dano": true
+            },
+            {
+              "linha": 3,
+              "vars": [
+                [
+                  "email",
+                  "\"user@site.com\""
+                ],
+                [
+                  "semEspaco",
+                  "true"
+                ],
+                [
+                  "formato",
+                  "true"
+                ]
+              ],
+              "fala": "As duas regras precisam ser verdadeiras: return devolve true.",
+              "dano": true
+            },
+            {
+              "linha": 3,
+              "vars": [
+                [
+                  "email",
+                  "\"user@site.com\""
+                ],
+                [
+                  "semEspaco",
+                  "true"
+                ],
+                [
+                  "formato",
+                  "true"
+                ]
+              ],
+              "fala": "Os testes passaram. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "function ehEmailValido(email) {\n  const semEspaco = ___email.includes(\" \");           // qual símbolo inverte a resposta?\n  const formato = /^[^@]+@[^@]+\\.[^@]+$/.___(email);   // qual método testa o padrão?\n  return semEspaco ___ formato;                      // qual operador exige as duas?\n}\n",
+          "testes": [
+            {
+              "in": [
+                "user@site.com"
+              ],
+              "out": true
+            },
+            {
+              "in": [
+                "a@b"
+              ],
+              "out": false
+            },
+            {
+              "in": [
+                "semarroba.com"
+              ],
+              "out": false
+            },
+            {
+              "in": [
+                "a b@c.com"
+              ],
+              "out": false
+            }
+          ]
+        }
+      }
+    }
+  },
+  "sec-cartao": {
+    "conceito": "Mostrar só o necessário",
+    "porque": "Dados sensíveis, como o número do cartão, nunca devem aparecer inteiros na tela, em logs ou em e-mails. A regra é mostrar só o suficiente para a pessoa se reconhecer, como os quatro últimos dígitos, e esconder o resto com asteriscos.",
+    "analogia": "É como o recibo da loja: ele mostra '**** 5678' e não o cartão inteiro. Quem lê consegue conferir se é o seu cartão, mas ninguém consegue copiar o número.",
+    "ideias": [
+      {
+        "titulo": "Mínimo necessário",
+        "texto": "Mostre o menor pedaço de informação que resolve o problema. O resto fica escondido."
+      },
+      {
+        "titulo": "Cortar o texto",
+        "texto": "slice(-4) pega os quatro últimos caracteres, contando a partir do fim."
+      },
+      {
+        "titulo": "Repetir um símbolo",
+        "texto": "\"*\".repeat(n) cria um texto com n asteriscos."
+      }
+    ],
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "const ultimos = numero.slice(-4);",
+            "explica": "slice corta um pedaço do texto. Com um número negativo, a contagem começa do fim: slice(-4) devolve os 4 últimos caracteres."
+          },
+          {
+            "trecho": "const escondidos = \"*\".repeat(numero.length - ultimos.length);",
+            "explica": "repeat(n) repete o texto n vezes: \"*\".repeat(3) dá \"***\". A quantidade é o tamanho do número menos o tamanho do pedaço que vai aparecer."
+          },
+          {
+            "trecho": "return escondidos + ultimos;",
+            "explica": "O + junta os dois textos: primeiro os asteriscos, depois os dígitos que podem aparecer."
+          }
+        ],
+        "demo": {
+          "entrada": "mascaraCartao(\"1234567812345678\")",
+          "codigo": [
+            "function mascaraCartao(numero) {",
+            "  const ultimos = numero.slice(-4);",
+            "  const escondidos = \"*\".repeat(numero.length - ultimos.length);",
+            "  return escondidos + ultimos;",
+            "}"
+          ],
+          "passos": [
+            {
+              "linha": 0,
+              "vars": [
+                [
+                  "numero",
+                  "\"1234567812345678\""
+                ]
+              ],
+              "fala": "O Criador chama mascaraCartao(\"1234567812345678\"). O número inteiro nunca pode aparecer."
+            },
+            {
+              "linha": 1,
+              "vars": [
+                [
+                  "numero",
+                  "\"1234567812345678\""
+                ],
+                [
+                  "ultimos",
+                  "\"5678\""
+                ]
+              ],
+              "fala": "Guarda só os quatro últimos dígitos, que são o que pode ser mostrado: \"5678\".",
+              "dano": true
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "numero",
+                  "\"1234567812345678\""
+                ],
+                [
+                  "ultimos",
+                  "\"5678\""
+                ],
+                [
+                  "escondidos",
+                  "\"************\""
+                ]
+              ],
+              "fala": "Calcula quantos dígitos precisam ser escondidos (o tamanho do número menos 4) e cria essa quantidade de asteriscos: \"************\".",
+              "dano": true
+            },
+            {
+              "linha": 3,
+              "vars": [
+                [
+                  "numero",
+                  "\"1234567812345678\""
+                ],
+                [
+                  "ultimos",
+                  "\"5678\""
+                ],
+                [
+                  "escondidos",
+                  "\"************\""
+                ]
+              ],
+              "fala": "Junta os asteriscos com os quatro últimos dígitos. return devolve \"************5678\".",
+              "dano": true
+            },
+            {
+              "linha": 3,
+              "vars": [
+                [
+                  "numero",
+                  "\"1234567812345678\""
+                ],
+                [
+                  "ultimos",
+                  "\"5678\""
+                ],
+                [
+                  "escondidos",
+                  "\"************\""
+                ]
+              ],
+              "fala": "Os testes passaram. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "function mascaraCartao(numero) {\n  const ultimos = numero.slice(___);                                   // como pegar os 4 últimos?\n  const escondidos = \"*\".___(numero.length - ultimos.length);          // qual método repete o texto?\n  return escondidos ___ ultimos;                                       // qual operador junta textos?\n}\n",
+          "testes": [
+            {
+              "in": [
+                "1234567812345678"
+              ],
+              "out": "************5678"
+            },
+            {
+              "in": [
+                "4111111111111111"
+              ],
+              "out": "************1111"
+            },
+            {
+              "in": [
+                "1234"
+              ],
+              "out": "1234"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "sec-idade": {
+    "conceito": "Validar antes de converter",
+    "porque": "Formulários mandam tudo como texto, e o texto pode ser qualquer coisa: letras, número negativo, decimal. Antes de usar como número, é preciso conferir que o texto é mesmo um inteiro e que está numa faixa razoável. Só depois se converte. Quem converte primeiro e confere depois deixa passar lixo.",
+    "analogia": "É como o guichê de um banco que confere o documento antes de abrir a conta: primeiro olha se é um documento de verdade, depois se os dados fazem sentido. Só então aceita.",
+    "ideias": [
+      {
+        "titulo": "Entrada é texto",
+        "texto": "Tudo que vem de um formulário chega como texto, mesmo que pareça número."
+      },
+      {
+        "titulo": "Validar primeiro",
+        "texto": "Confira o formato antes de converter, e a faixa antes de aceitar."
+      },
+      {
+        "titulo": "null = recusado",
+        "texto": "Devolver null é o jeito de dizer 'esse valor não serve'."
+      }
+    ],
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "if (!/^\\d+$/.test(valor)) {",
+            "explica": "O padrão ^\\d+$ significa 'do começo ao fim, só dígitos (\\d), um ou mais (+)'. O ! inverte: o if entra quando o texto NÃO é só dígitos. Isso já recusa letras, sinal de menos e decimais."
+          },
+          {
+            "trecho": "return null;",
+            "explica": "null quer dizer 'nada, valor recusado'. O return encerra a função na hora."
+          },
+          {
+            "trecho": "const idade = Number(valor);",
+            "explica": "Só agora, com o formato garantido, convertemos o texto em número com Number(...)."
+          },
+          {
+            "trecho": "if (idade > 120) {",
+            "explica": "Segunda defesa: mesmo sendo inteiro, precisa estar na faixa. Como o formato já exclui negativos, só falta o limite de cima."
+          }
+        ],
+        "demo": {
+          "entrada": "validaIdade(\"25\")",
+          "codigo": [
+            "function validaIdade(valor) {",
+            "  if (!/^\\d+$/.test(valor)) {",
+            "    return null;",
+            "  }",
+            "  const idade = Number(valor);",
+            "  if (idade > 120) {",
+            "    return null;",
+            "  }",
+            "  return idade;",
+            "}"
+          ],
+          "passos": [
+            {
+              "linha": 0,
+              "vars": [
+                [
+                  "valor",
+                  "\"25\""
+                ]
+              ],
+              "fala": "O Criador chama validaIdade(\"25\"). Chega como texto, e precisa ser conferido antes de virar número."
+            },
+            {
+              "linha": 1,
+              "vars": [
+                [
+                  "valor",
+                  "\"25\""
+                ]
+              ],
+              "fala": "O texto \"25\" é só dígitos? Sim, passou da primeira checagem e o programa pula o bloco."
+            },
+            {
+              "linha": 4,
+              "vars": [
+                [
+                  "valor",
+                  "\"25\""
+                ],
+                [
+                  "idade",
+                  "25"
+                ]
+              ],
+              "fala": "Agora que é seguro, converte o texto em número: idade = 25.",
+              "dano": true
+            },
+            {
+              "linha": 5,
+              "vars": [
+                [
+                  "valor",
+                  "\"25\""
+                ],
+                [
+                  "idade",
+                  "25"
+                ]
+              ],
+              "fala": "25 é maior que 120? Não, está dentro da faixa e o programa pula o bloco."
+            },
+            {
+              "linha": 8,
+              "vars": [
+                [
+                  "valor",
+                  "\"25\""
+                ],
+                [
+                  "idade",
+                  "25"
+                ]
+              ],
+              "fala": "Passou nas duas checagens, então return devolve a idade: 25.",
+              "dano": true
+            },
+            {
+              "linha": 8,
+              "vars": [
+                [
+                  "valor",
+                  "\"25\""
+                ],
+                [
+                  "idade",
+                  "25"
+                ]
+              ],
+              "fala": "Os testes passaram. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "function validaIdade(valor) {\n  if (!/^\\d+$/.___(valor)) {      // qual método testa o padrão?\n    return ___;                   // o que devolver quando o formato é inválido?\n  }\n  const idade = ___(valor);       // qual função converte texto em número?\n  if (idade > ___) {              // qual o limite de cima?\n    return null;\n  }\n  return idade;\n}\n",
+          "testes": [
+            {
+              "in": [
+                "25"
+              ],
+              "out": 25
+            },
+            {
+              "in": [
+                "abc"
+              ],
+              "out": null
+            },
+            {
+              "in": [
+                "-5"
+              ],
+              "out": null
+            },
+            {
+              "in": [
+                "121"
+              ],
+              "out": null
+            },
+            {
+              "in": [
+                "0"
+              ],
+              "out": 0
+            }
+          ]
+        }
+      }
+    }
+  },
+  "sec-exame-d": {
+    "conceito": "Injeção de SQL e o escape de aspas",
+    "porque": "Se um programa monta um comando de banco de dados juntando texto digitado pelo usuário, uma aspa simples no meio do texto pode fechar o texto e permitir que o atacante escreva comandos seus. Uma primeira defesa é dobrar cada aspa simples, para que ela seja lida como parte do texto. (No mundo real, o ideal é usar consultas parametrizadas.)",
+    "analogia": "É como uma frase entre aspas num livro: se o texto tiver uma aspa dentro, você a duplica para o leitor entender que a citação continua. Sem isso, a citação seria encerrada no lugar errado.",
+    "ideias": [
+      {
+        "titulo": "Injeção de SQL",
+        "texto": "O atacante escreve comandos de banco de dados dentro de um campo que deveria ter só um nome ou número."
+      },
+      {
+        "titulo": "Dobrar a aspa",
+        "texto": "Trocar ' por '' faz o banco entender a aspa como parte do texto."
+      },
+      {
+        "titulo": "Defesa em camadas",
+        "texto": "O escape ajuda, mas o mais seguro é nunca montar SQL juntando textos: use parâmetros."
+      }
+    ],
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "const escapado = valor.replaceAll(\"'\", \"''\");",
+            "explica": "replaceAll troca TODAS as ocorrências. O primeiro texto é o que se procura (uma aspa simples, entre aspas duplas) e o segundo é o que entra no lugar (duas aspas simples)."
+          },
+          {
+            "trecho": "return escapado;",
+            "explica": "Devolve a versão tratada, que é a única que pode ser usada no comando."
+          }
+        ],
+        "demo": {
+          "entrada": "escapaSql(\"O'Brien\")",
+          "codigo": [
+            "function escapaSql(valor) {",
+            "  const escapado = valor.replaceAll(\"'\", \"''\");",
+            "  return escapado;",
+            "}"
+          ],
+          "passos": [
+            {
+              "linha": 0,
+              "vars": [
+                [
+                  "valor",
+                  "\"O'Brien\""
+                ]
+              ],
+              "fala": "O Criador chama escapaSql(\"O'Brien\"). A aspa simples no meio do nome é o perigo."
+            },
+            {
+              "linha": 1,
+              "vars": [
+                [
+                  "valor",
+                  "\"O'Brien\""
+                ],
+                [
+                  "escapado",
+                  "\"O''Brien\""
+                ]
+              ],
+              "fala": "Troca cada aspa simples por duas. O banco passa a entender as duas como uma só aspa dentro do texto: \"O''Brien\".",
+              "dano": true
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "valor",
+                  "\"O'Brien\""
+                ],
+                [
+                  "escapado",
+                  "\"O''Brien\""
+                ]
+              ],
+              "fala": "return devolve o texto tratado: \"O''Brien\".",
+              "dano": true
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "valor",
+                  "\"O'Brien\""
+                ],
+                [
+                  "escapado",
+                  "\"O''Brien\""
+                ]
+              ],
+              "fala": "Os testes passaram. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "function escapaSql(valor) {\n  const escapado = valor.replaceAll(___, \"''\");   // qual caractere procurar?\n  return ___;                                     // o que devolver?\n}\n",
+          "testes": [
+            {
+              "in": [
+                "O'Brien"
+              ],
+              "out": "O''Brien"
+            },
+            {
+              "in": [
+                "normal"
+              ],
+              "out": "normal"
+            },
+            {
+              "in": [
+                "'"
+              ],
+              "out": "''"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "dat-total": {
+    "conceito": "Somar uma coluna de uma base de dados",
+    "porque": "Dados quase sempre chegam como uma lista de registros, como linhas de uma planilha. Para responder 'quanto vendemos no total?', você percorre as linhas, calcula o valor de cada uma (preço × quantidade) e vai somando num total.",
+    "analogia": "É como somar a nota fiscal de uma compra: você passa linha por linha, multiplica o preço pela quantidade e acumula o resultado no fim da conta.",
+    "ideias": [
+      {
+        "titulo": "Base (lista de objetos)",
+        "texto": "Uma tabela em código: cada item da lista é uma linha, e cada campo do objeto é uma coluna."
+      },
+      {
+        "titulo": "Objeto",
+        "texto": "Um registro com campos nomeados, como { produto: 'Espada', preco: 100 }. Para ler um campo, use o ponto: venda.preco."
+      },
+      {
+        "titulo": "Acumulador",
+        "texto": "Uma variável que começa em 0 e vai crescendo a cada linha."
+      }
+    ],
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "for (const venda of vendas) {",
+            "explica": "Percorre a base: a cada volta, venda recebe a próxima linha, que é um objeto com os campos da venda."
+          },
+          {
+            "trecho": "total += venda.preco * venda.qtd;",
+            "explica": "venda.preco lê o campo preco do objeto (o ponto acessa um campo). O * multiplica. O += soma o resultado ao que já estava em total."
+          },
+          {
+            "trecho": "return total;",
+            "explica": "Fora do laço: devolve a soma depois que todas as linhas foram visitadas."
+          }
+        ],
+        "demo": {
+          "entrada": "totalVendas([{produto: \"Espada\", preco: 100, qtd: 2}, {produto: \"Escudo\", preco: 80, qtd: 3}])",
+          "codigo": [
+            "function totalVendas(vendas) {",
+            "  let total = 0;",
+            "  for (const venda of vendas) {",
+            "    total += venda.preco * venda.qtd;",
+            "  }",
+            "  return total;",
+            "}"
+          ],
+          "passos": [
+            {
+              "linha": 0,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (2 vendas)"
+                ]
+              ],
+              "fala": "O Criador chama totalVendas com uma base de 2 vendas. Cada venda é um objeto com produto, preço e quantidade."
+            },
+            {
+              "linha": 1,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (2 vendas)"
+                ],
+                [
+                  "total",
+                  "0"
+                ]
+              ],
+              "fala": "Cria o total começando em 0."
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (2 vendas)"
+                ],
+                [
+                  "total",
+                  "0"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Espada\", preco: 100, qtd: 2}"
+                ]
+              ],
+              "fala": "O laço pega a próxima venda da base: venda = {produto: \"Espada\", preco: 100, qtd: 2}."
+            },
+            {
+              "linha": 3,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (2 vendas)"
+                ],
+                [
+                  "total",
+                  "200"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Espada\", preco: 100, qtd: 2}"
+                ]
+              ],
+              "fala": "Calcula preco × qtd desta venda e soma ao total. Agora total = 200.",
+              "dano": true
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (2 vendas)"
+                ],
+                [
+                  "total",
+                  "200"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Escudo\", preco: 80, qtd: 3}"
+                ]
+              ],
+              "fala": "O laço pega a próxima venda da base: venda = {produto: \"Escudo\", preco: 80, qtd: 3}."
+            },
+            {
+              "linha": 3,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (2 vendas)"
+                ],
+                [
+                  "total",
+                  "440"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Escudo\", preco: 80, qtd: 3}"
+                ]
+              ],
+              "fala": "Calcula preco × qtd desta venda e soma ao total. Agora total = 440.",
+              "dano": true
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (2 vendas)"
+                ],
+                [
+                  "total",
+                  "440"
+                ]
+              ],
+              "fala": "Acabaram as vendas, então o laço termina."
+            },
+            {
+              "linha": 5,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (2 vendas)"
+                ],
+                [
+                  "total",
+                  "440"
+                ]
+              ],
+              "fala": "return devolve a receita total: 440."
+            },
+            {
+              "linha": 5,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (2 vendas)"
+                ],
+                [
+                  "total",
+                  "440"
+                ]
+              ],
+              "fala": "Os testes passaram. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "function totalVendas(vendas) {\n  let total = ___;                              // começa em quanto?\n  for (const venda of ___) {                    // o que percorrer?\n    total += venda.preco * venda.___;           // qual campo multiplica o preço?\n  }\n  return ___;                                   // o que devolver?\n}\n",
+          "testes": [
+            {
+              "in": [
+                [
+                  {
+                    "produto": "X",
+                    "preco": 10,
+                    "qtd": 3
+                  }
+                ]
+              ],
+              "out": 30
+            },
+            {
+              "in": [
+                []
+              ],
+              "out": 0
+            },
+            {
+              "in": [
+                [
+                  {
+                    "produto": "A",
+                    "preco": 5,
+                    "qtd": 2
+                  },
+                  {
+                    "produto": "B",
+                    "preco": 1,
+                    "qtd": 4
+                  }
+                ]
+              ],
+              "out": 14
+            }
+          ]
+        }
+      }
+    }
+  },
+  "dat-conta": {
+    "conceito": "Filtrar e contar",
+    "porque": "Para responder 'quantos itens são desta categoria?', você percorre a base e, em cada linha, pergunta se o campo categoria é a que procuramos. Só as linhas que passam no teste entram na contagem. É o jeito de transformar uma tabela grande numa resposta pequena.",
+    "analogia": "É como separar as meias por cor: você passa por todas, olha a cor de cada uma e só marca um risquinho quando é a cor pedida. No fim, os risquinhos são a resposta.",
+    "ideias": [
+      {
+        "titulo": "Base (lista de objetos)",
+        "texto": "Uma tabela em código: cada item da lista é uma linha, e cada campo do objeto é uma coluna."
+      },
+      {
+        "titulo": "Condição sobre um campo",
+        "texto": "Comparar venda.categoria com o valor procurado dá true ou false."
+      },
+      {
+        "titulo": "Contador condicional",
+        "texto": "Só aumenta nas voltas em que a condição é verdadeira."
+      }
+    ],
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "function contaPorCategoria(vendas, categoria) {",
+            "explica": "A função recebe dois parâmetros, separados por vírgula: a base e o valor que estamos procurando."
+          },
+          {
+            "trecho": "if (venda.categoria === categoria) {",
+            "explica": "venda.categoria lê o campo do objeto. O === compara se os dois valores são exatamente iguais. O bloco só roda para as linhas que combinam."
+          },
+          {
+            "trecho": "contador += 1;",
+            "explica": "Soma 1 ao contador. Fica dentro do if, por isso só conta as vendas da categoria."
+          }
+        ],
+        "demo": {
+          "entrada": "contaPorCategoria([{produto: \"Espada\", categoria: \"arma\"}, {produto: \"Escudo\", categoria: \"defesa\"}, {produto: \"Arco\", categoria: \"arma\"}], \"arma\")",
+          "codigo": [
+            "function contaPorCategoria(vendas, categoria) {",
+            "  let contador = 0;",
+            "  for (const venda of vendas) {",
+            "    if (venda.categoria === categoria) {",
+            "      contador += 1;",
+            "    }",
+            "  }",
+            "  return contador;",
+            "}"
+          ],
+          "passos": [
+            {
+              "linha": 0,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "categoria",
+                  "\"arma\""
+                ]
+              ],
+              "fala": "O Criador chama contaPorCategoria com uma base de 3 vendas e a categoria \"arma\"."
+            },
+            {
+              "linha": 1,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "categoria",
+                  "\"arma\""
+                ],
+                [
+                  "contador",
+                  "0"
+                ]
+              ],
+              "fala": "Cria o contador em 0."
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "categoria",
+                  "\"arma\""
+                ],
+                [
+                  "contador",
+                  "0"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Espada\", categoria: \"arma\"}"
+                ]
+              ],
+              "fala": "O laço pega a próxima venda: venda = {produto: \"Espada\", categoria: \"arma\"}."
+            },
+            {
+              "linha": 3,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "categoria",
+                  "\"arma\""
+                ],
+                [
+                  "contador",
+                  "0"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Espada\", categoria: \"arma\"}"
+                ]
+              ],
+              "fala": "A categoria desta venda é igual a \"arma\"? Sim, então entra no bloco."
+            },
+            {
+              "linha": 4,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "categoria",
+                  "\"arma\""
+                ],
+                [
+                  "contador",
+                  "1"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Espada\", categoria: \"arma\"}"
+                ]
+              ],
+              "fala": "Achou uma venda da categoria! O contador agora vale 1.",
+              "dano": true
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "categoria",
+                  "\"arma\""
+                ],
+                [
+                  "contador",
+                  "1"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Escudo\", categoria: \"defesa\"}"
+                ]
+              ],
+              "fala": "O laço pega a próxima venda: venda = {produto: \"Escudo\", categoria: \"defesa\"}."
+            },
+            {
+              "linha": 3,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "categoria",
+                  "\"arma\""
+                ],
+                [
+                  "contador",
+                  "1"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Escudo\", categoria: \"defesa\"}"
+                ]
+              ],
+              "fala": "A categoria desta venda é igual a \"arma\"? Não, então o programa pula o bloco."
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "categoria",
+                  "\"arma\""
+                ],
+                [
+                  "contador",
+                  "1"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Arco\", categoria: \"arma\"}"
+                ]
+              ],
+              "fala": "O laço pega a próxima venda: venda = {produto: \"Arco\", categoria: \"arma\"}."
+            },
+            {
+              "linha": 3,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "categoria",
+                  "\"arma\""
+                ],
+                [
+                  "contador",
+                  "1"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Arco\", categoria: \"arma\"}"
+                ]
+              ],
+              "fala": "A categoria desta venda é igual a \"arma\"? Sim, então entra no bloco."
+            },
+            {
+              "linha": 4,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "categoria",
+                  "\"arma\""
+                ],
+                [
+                  "contador",
+                  "2"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Arco\", categoria: \"arma\"}"
+                ]
+              ],
+              "fala": "Achou uma venda da categoria! O contador agora vale 2.",
+              "dano": true
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "categoria",
+                  "\"arma\""
+                ],
+                [
+                  "contador",
+                  "2"
+                ]
+              ],
+              "fala": "Acabaram as vendas, então o laço termina."
+            },
+            {
+              "linha": 7,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "categoria",
+                  "\"arma\""
+                ],
+                [
+                  "contador",
+                  "2"
+                ]
+              ],
+              "fala": "return devolve o contador: 2 itens."
+            },
+            {
+              "linha": 7,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "categoria",
+                  "\"arma\""
+                ],
+                [
+                  "contador",
+                  "2"
+                ]
+              ],
+              "fala": "Os testes passaram. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "function contaPorCategoria(vendas, categoria) {\n  let contador = 0;\n  for (const venda of vendas) {\n    if (venda.___ === categoria) {        // qual campo comparar?\n      contador += ___;                    // quanto somar?\n    }\n  }\n  return ___;                             // o que devolver?\n}\n",
+          "testes": [
+            {
+              "in": [
+                [
+                  {
+                    "produto": "A",
+                    "categoria": "x"
+                  },
+                  {
+                    "produto": "B",
+                    "categoria": "y"
+                  },
+                  {
+                    "produto": "C",
+                    "categoria": "x"
+                  }
+                ],
+                "x"
+              ],
+              "out": 2
+            },
+            {
+              "in": [
+                [],
+                "x"
+              ],
+              "out": 0
+            }
+          ]
+        }
+      }
+    }
+  },
+  "dat-exame-e": {
+    "conceito": "Achar o maior valor e devolver outro campo",
+    "porque": "Achar o produto mais caro é o mesmo raciocínio de achar o maior número, mas agora cada item é um objeto. Guardamos o objeto campeão inteiro e comparamos os preços; no fim, devolvemos o NOME dele, e não o preço.",
+    "analogia": "É como um torneio: o primeiro competidor é o campeão, e cada novo é comparado com ele pelo preço. Quem ganhar assume o título. No fim, você anuncia o nome do campeão.",
+    "ideias": [
+      {
+        "titulo": "Objeto",
+        "texto": "Um registro com campos nomeados, como { produto: 'Espada', preco: 100 }. Para ler um campo, use o ponto: venda.preco."
+      },
+      {
+        "titulo": "Campeão é um objeto",
+        "texto": "Guardamos o registro inteiro, e não só o número, para poder devolver outro campo depois."
+      },
+      {
+        "titulo": "Devolver um campo",
+        "texto": "campeao.produto devolve só o nome."
+      }
+    ],
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "let campeao = vendas[0];",
+            "explica": "vendas[0] é o primeiro objeto da lista (as posições começam em 0). Guardamos o objeto inteiro."
+          },
+          {
+            "trecho": "if (venda.preco > campeao.preco) {",
+            "explica": "Compara o campo preco dos dois objetos. O > pergunta se o da esquerda é maior. Em caso de empate a condição é falsa, e o primeiro continua campeão, como o enunciado pede."
+          },
+          {
+            "trecho": "return campeao.produto;",
+            "explica": "Devolve apenas o campo produto do campeão, o nome."
+          }
+        ],
+        "demo": {
+          "entrada": "maisCaro([{produto: \"Espada\", preco: 100}, {produto: \"Arco\", preco: 140}, {produto: \"Elmo\", preco: 90}])",
+          "codigo": [
+            "function maisCaro(vendas) {",
+            "  let campeao = vendas[0];",
+            "  for (const venda of vendas) {",
+            "    if (venda.preco > campeao.preco) {",
+            "      campeao = venda;",
+            "    }",
+            "  }",
+            "  return campeao.produto;",
+            "}"
+          ],
+          "passos": [
+            {
+              "linha": 0,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ]
+              ],
+              "fala": "O Criador chama maisCaro com uma base de 3 vendas."
+            },
+            {
+              "linha": 1,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "campeao",
+                  "{produto: \"Espada\", preco: 100}"
+                ]
+              ],
+              "fala": "Elege a primeira venda como campeã por enquanto: campeao = {produto: \"Espada\", preco: 100}."
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "campeao",
+                  "{produto: \"Espada\", preco: 100}"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Espada\", preco: 100}"
+                ]
+              ],
+              "fala": "O laço pega a próxima venda: venda = {produto: \"Espada\", preco: 100}."
+            },
+            {
+              "linha": 3,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "campeao",
+                  "{produto: \"Espada\", preco: 100}"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Espada\", preco: 100}"
+                ]
+              ],
+              "fala": "O preço desta venda é maior que o do campeão? Não, o campeão continua o mesmo."
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "campeao",
+                  "{produto: \"Espada\", preco: 100}"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Arco\", preco: 140}"
+                ]
+              ],
+              "fala": "O laço pega a próxima venda: venda = {produto: \"Arco\", preco: 140}."
+            },
+            {
+              "linha": 3,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "campeao",
+                  "{produto: \"Espada\", preco: 100}"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Arco\", preco: 140}"
+                ]
+              ],
+              "fala": "O preço desta venda é maior que o do campeão? Sim, então entra no bloco."
+            },
+            {
+              "linha": 4,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "campeao",
+                  "{produto: \"Arco\", preco: 140}"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Arco\", preco: 140}"
+                ]
+              ],
+              "fala": "O novo campeão é {produto: \"Arco\", preco: 140}.",
+              "dano": true
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "campeao",
+                  "{produto: \"Arco\", preco: 140}"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Elmo\", preco: 90}"
+                ]
+              ],
+              "fala": "O laço pega a próxima venda: venda = {produto: \"Elmo\", preco: 90}."
+            },
+            {
+              "linha": 3,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "campeao",
+                  "{produto: \"Arco\", preco: 140}"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Elmo\", preco: 90}"
+                ]
+              ],
+              "fala": "O preço desta venda é maior que o do campeão? Não, o campeão continua o mesmo."
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "campeao",
+                  "{produto: \"Arco\", preco: 140}"
+                ]
+              ],
+              "fala": "Acabaram as vendas, então o laço termina."
+            },
+            {
+              "linha": 7,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "campeao",
+                  "{produto: \"Arco\", preco: 140}"
+                ]
+              ],
+              "fala": "return devolve o NOME do campeão, e não o objeto inteiro: \"Arco\".",
+              "dano": true
+            },
+            {
+              "linha": 7,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "campeao",
+                  "{produto: \"Arco\", preco: 140}"
+                ]
+              ],
+              "fala": "Os testes passaram. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "function maisCaro(vendas) {\n  let campeao = vendas[___];                 // qual posição é a primeira?\n  for (const venda of vendas) {\n    if (venda.preco ___ campeao.preco) {     // quando o campeão é trocado?\n      campeao = ___;                         // quem vira o campeão?\n    }\n  }\n  return campeao.___;                        // qual campo devolver?\n}\n",
+          "testes": [
+            {
+              "in": [
+                [
+                  {
+                    "produto": "A",
+                    "preco": 5
+                  }
+                ]
+              ],
+              "out": "A"
+            },
+            {
+              "in": [
+                [
+                  {
+                    "produto": "X",
+                    "preco": 1
+                  },
+                  {
+                    "produto": "Y",
+                    "preco": 3
+                  },
+                  {
+                    "produto": "Z",
+                    "preco": 3
+                  }
+                ]
+              ],
+              "out": "Y"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "dat-filtra": {
+    "conceito": "Filtrar uma base e montar uma lista nova",
+    "porque": "Às vezes a resposta não é um número, e sim uma lista: quais produtos custam mais que um limite? Você percorre a base, testa cada linha e, quando passa, coloca o nome numa lista nova, preservando a ordem em que aparecem.",
+    "analogia": "É como uma peneira: passa por ela só o que atende à regra, e o que sobra no prato é a sua lista.",
+    "ideias": [
+      {
+        "titulo": "Base (lista de objetos)",
+        "texto": "Uma tabela em código: cada item da lista é uma linha, e cada campo do objeto é uma coluna."
+      },
+      {
+        "titulo": "Lista nova",
+        "texto": "Começa vazia ([]) e ganha itens com push, um por vez."
+      },
+      {
+        "titulo": "Mesma ordem",
+        "texto": "Como percorremos a base do começo ao fim, os nomes saem na ordem original."
+      }
+    ],
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "const nomes = [];",
+            "explica": "Os colchetes vazios [] criam uma lista vazia. Usamos const porque a variável continua apontando para a mesma lista (o conteúdo dela é que muda)."
+          },
+          {
+            "trecho": "nomes.push(venda.produto);",
+            "explica": "push coloca um item no fim da lista. Aqui entra o nome do produto, não o objeto inteiro."
+          },
+          {
+            "trecho": "return nomes;",
+            "explica": "Devolve a lista montada, na ordem em que os itens foram adicionados."
+          }
+        ],
+        "demo": {
+          "entrada": "filtraAcima([{produto: \"Espada\", preco: 100}, {produto: \"Escudo\", preco: 80}, {produto: \"Arco\", preco: 140}], 90)",
+          "codigo": [
+            "function filtraAcima(vendas, limite) {",
+            "  const nomes = [];",
+            "  for (const venda of vendas) {",
+            "    if (venda.preco > limite) {",
+            "      nomes.push(venda.produto);",
+            "    }",
+            "  }",
+            "  return nomes;",
+            "}"
+          ],
+          "passos": [
+            {
+              "linha": 0,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "limite",
+                  "90"
+                ]
+              ],
+              "fala": "O Criador chama filtraAcima com uma base de 3 vendas e o limite 90."
+            },
+            {
+              "linha": 1,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "limite",
+                  "90"
+                ],
+                [
+                  "nomes",
+                  "[]"
+                ]
+              ],
+              "fala": "Cria a lista de resultados, ainda vazia: nomes = []."
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "limite",
+                  "90"
+                ],
+                [
+                  "nomes",
+                  "[]"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Espada\", preco: 100}"
+                ]
+              ],
+              "fala": "O laço pega a próxima venda: venda = {produto: \"Espada\", preco: 100}."
+            },
+            {
+              "linha": 3,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "limite",
+                  "90"
+                ],
+                [
+                  "nomes",
+                  "[]"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Espada\", preco: 100}"
+                ]
+              ],
+              "fala": "O preço é maior que o limite (90)? Sim, então entra no bloco."
+            },
+            {
+              "linha": 4,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "limite",
+                  "90"
+                ],
+                [
+                  "nomes",
+                  "[\"Espada\"]"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Espada\", preco: 100}"
+                ]
+              ],
+              "fala": "Coloca o nome do produto no fim da lista: nomes = [\"Espada\"].",
+              "dano": true
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "limite",
+                  "90"
+                ],
+                [
+                  "nomes",
+                  "[\"Espada\"]"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Escudo\", preco: 80}"
+                ]
+              ],
+              "fala": "O laço pega a próxima venda: venda = {produto: \"Escudo\", preco: 80}."
+            },
+            {
+              "linha": 3,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "limite",
+                  "90"
+                ],
+                [
+                  "nomes",
+                  "[\"Espada\"]"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Escudo\", preco: 80}"
+                ]
+              ],
+              "fala": "O preço é maior que o limite (90)? Não, então o programa pula o bloco."
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "limite",
+                  "90"
+                ],
+                [
+                  "nomes",
+                  "[\"Espada\"]"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Arco\", preco: 140}"
+                ]
+              ],
+              "fala": "O laço pega a próxima venda: venda = {produto: \"Arco\", preco: 140}."
+            },
+            {
+              "linha": 3,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "limite",
+                  "90"
+                ],
+                [
+                  "nomes",
+                  "[\"Espada\"]"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Arco\", preco: 140}"
+                ]
+              ],
+              "fala": "O preço é maior que o limite (90)? Sim, então entra no bloco."
+            },
+            {
+              "linha": 4,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "limite",
+                  "90"
+                ],
+                [
+                  "nomes",
+                  "[\"Espada\", \"Arco\"]"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Arco\", preco: 140}"
+                ]
+              ],
+              "fala": "Coloca o nome do produto no fim da lista: nomes = [\"Espada\", \"Arco\"].",
+              "dano": true
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "limite",
+                  "90"
+                ],
+                [
+                  "nomes",
+                  "[\"Espada\", \"Arco\"]"
+                ]
+              ],
+              "fala": "Acabaram as vendas, então o laço termina."
+            },
+            {
+              "linha": 7,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "limite",
+                  "90"
+                ],
+                [
+                  "nomes",
+                  "[\"Espada\", \"Arco\"]"
+                ]
+              ],
+              "fala": "return devolve a lista de nomes: [\"Espada\", \"Arco\"]."
+            },
+            {
+              "linha": 7,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "limite",
+                  "90"
+                ],
+                [
+                  "nomes",
+                  "[\"Espada\", \"Arco\"]"
+                ]
+              ],
+              "fala": "Os testes passaram. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "function filtraAcima(vendas, limite) {\n  const nomes = ___;                         // como criar uma lista vazia?\n  for (const venda of vendas) {\n    if (venda.preco ___ limite) {            // quando o produto entra na lista?\n      nomes.___(venda.produto);              // qual método coloca no fim da lista?\n    }\n  }\n  return ___;                                // o que devolver?\n}\n",
+          "testes": [
+            {
+              "in": [
+                [
+                  {
+                    "produto": "A",
+                    "preco": 10
+                  },
+                  {
+                    "produto": "B",
+                    "preco": 50
+                  },
+                  {
+                    "produto": "C",
+                    "preco": 70
+                  }
+                ],
+                20
+              ],
+              "out": [
+                "B",
+                "C"
+              ]
+            },
+            {
+              "in": [
+                [
+                  {
+                    "produto": "A",
+                    "preco": 10
+                  }
+                ],
+                20
+              ],
+              "out": []
+            }
+          ]
+        }
+      }
+    }
+  },
+  "dat-media": {
+    "conceito": "Média: somar e dividir, com cuidado",
+    "porque": "A média é a soma dos valores dividida pela quantidade. Dois cuidados: com a base vazia não dá para dividir (a resposta combinada é 0), e o resultado precisa ser arredondado para o inteiro mais próximo.",
+    "analogia": "É como dividir a conta do restaurante: soma tudo e divide pelo número de pessoas. Se ninguém foi, não há o que dividir.",
+    "ideias": [
+      {
+        "titulo": "Caso especial",
+        "texto": "Base vazia é tratada logo no começo, antes de qualquer divisão."
+      },
+      {
+        "titulo": "Média",
+        "texto": "soma ÷ quantidade. A quantidade é o tamanho da lista (vendas.length)."
+      },
+      {
+        "titulo": "Arredondar",
+        "texto": "Math.round leva ao inteiro mais próximo: 21,67 vira 22."
+      }
+    ],
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "if (vendas.length === 0) {",
+            "explica": "length é o tamanho da lista. Com 0 itens, devolvemos 0 antes de tentar dividir."
+          },
+          {
+            "trecho": "soma += venda.preco;",
+            "explica": "Acumula só o preço de cada venda (aqui a quantidade não entra)."
+          },
+          {
+            "trecho": "return Math.round(soma / vendas.length);",
+            "explica": "soma / vendas.length é a média, que pode ter casas decimais (21,666...). Math.round arredonda para o inteiro mais próximo."
+          }
+        ],
+        "demo": {
+          "entrada": "mediaPreco([{produto: \"A\", preco: 10}, {produto: \"B\", preco: 20}, {produto: \"C\", preco: 35}])",
+          "codigo": [
+            "function mediaPreco(vendas) {",
+            "  if (vendas.length === 0) {",
+            "    return 0;",
+            "  }",
+            "  let soma = 0;",
+            "  for (const venda of vendas) {",
+            "    soma += venda.preco;",
+            "  }",
+            "  return Math.round(soma / vendas.length);",
+            "}"
+          ],
+          "passos": [
+            {
+              "linha": 0,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ]
+              ],
+              "fala": "O Criador chama mediaPreco com uma base de 3 vendas."
+            },
+            {
+              "linha": 1,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ]
+              ],
+              "fala": "A base está vazia? Não, então dá para calcular a média e o programa pula o bloco."
+            },
+            {
+              "linha": 4,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "soma",
+                  "0"
+                ]
+              ],
+              "fala": "Cria a soma dos preços começando em 0."
+            },
+            {
+              "linha": 5,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "soma",
+                  "0"
+                ],
+                [
+                  "venda",
+                  "{produto: \"A\", preco: 10}"
+                ]
+              ],
+              "fala": "O laço pega a próxima venda: venda = {produto: \"A\", preco: 10}."
+            },
+            {
+              "linha": 6,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "soma",
+                  "10"
+                ],
+                [
+                  "venda",
+                  "{produto: \"A\", preco: 10}"
+                ]
+              ],
+              "fala": "Soma o preço desta venda: soma = 10.",
+              "dano": true
+            },
+            {
+              "linha": 5,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "soma",
+                  "10"
+                ],
+                [
+                  "venda",
+                  "{produto: \"B\", preco: 20}"
+                ]
+              ],
+              "fala": "O laço pega a próxima venda: venda = {produto: \"B\", preco: 20}."
+            },
+            {
+              "linha": 6,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "soma",
+                  "30"
+                ],
+                [
+                  "venda",
+                  "{produto: \"B\", preco: 20}"
+                ]
+              ],
+              "fala": "Soma o preço desta venda: soma = 30.",
+              "dano": true
+            },
+            {
+              "linha": 5,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "soma",
+                  "30"
+                ],
+                [
+                  "venda",
+                  "{produto: \"C\", preco: 35}"
+                ]
+              ],
+              "fala": "O laço pega a próxima venda: venda = {produto: \"C\", preco: 35}."
+            },
+            {
+              "linha": 6,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "soma",
+                  "65"
+                ],
+                [
+                  "venda",
+                  "{produto: \"C\", preco: 35}"
+                ]
+              ],
+              "fala": "Soma o preço desta venda: soma = 65.",
+              "dano": true
+            },
+            {
+              "linha": 5,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "soma",
+                  "65"
+                ]
+              ],
+              "fala": "Acabaram as vendas, então o laço termina."
+            },
+            {
+              "linha": 8,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "soma",
+                  "65"
+                ]
+              ],
+              "fala": "Divide a soma pela quantidade de vendas e arredonda para o inteiro mais próximo. return devolve 22.",
+              "dano": true
+            },
+            {
+              "linha": 8,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "soma",
+                  "65"
+                ]
+              ],
+              "fala": "Os testes passaram. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "function mediaPreco(vendas) {\n  if (vendas.length === ___) {                 // quando a base está vazia?\n    return 0;\n  }\n  let soma = 0;\n  for (const venda of vendas) {\n    soma += venda.___;                         // qual campo somar?\n  }\n  return Math.___(soma / vendas.length);       // qual método arredonda para o mais próximo?\n}\n",
+          "testes": [
+            {
+              "in": [
+                [
+                  {
+                    "produto": "A",
+                    "preco": 10
+                  },
+                  {
+                    "produto": "B",
+                    "preco": 20
+                  }
+                ]
+              ],
+              "out": 15
+            },
+            {
+              "in": [
+                []
+              ],
+              "out": 0
+            },
+            {
+              "in": [
+                [
+                  {
+                    "produto": "C",
+                    "preco": 7
+                  }
+                ]
+              ],
+              "out": 7
+            }
+          ]
+        }
+      }
+    }
+  },
+  "dat-exame-d": {
+    "conceito": "Comparar pelo valor calculado",
+    "porque": "O produto mais caro não é, necessariamente, o que mais rendeu: a receita é preço × quantidade. Para achar o maior, calculamos esse valor para cada linha e comparamos, guardando sempre o melhor visto até agora.",
+    "analogia": "É um ranking de faturamento: cada produto entra com a sua receita (o que cobra vezes o que vendeu), e quem faturou mais assume o topo.",
+    "ideias": [
+      {
+        "titulo": "Valor calculado",
+        "texto": "O critério de comparação não é um campo pronto, e sim uma conta com dois campos."
+      },
+      {
+        "titulo": "Melhor até agora",
+        "texto": "Guardamos o objeto vencedor e o trocamos quando aparece um que fatura mais."
+      },
+      {
+        "titulo": "Empate",
+        "texto": "Com >, quem chegou primeiro permanece. Isso resolve o empate como o enunciado pede."
+      }
+    ],
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "if (venda.preco * venda.qtd > melhor.preco * melhor.qtd) {",
+            "explica": "Os dois lados do > são contas: a receita desta venda contra a receita da melhor até agora. A multiplicação é feita antes da comparação."
+          },
+          {
+            "trecho": "melhor = venda;",
+            "explica": "Troca a melhor guardando o objeto inteiro da venda atual."
+          },
+          {
+            "trecho": "return melhor.produto;",
+            "explica": "Devolve só o nome do produto vencedor."
+          }
+        ],
+        "demo": {
+          "entrada": "topProduto([{produto: \"Espada\", preco: 100, qtd: 2}, {produto: \"Escudo\", preco: 80, qtd: 3}, {produto: \"Arco\", preco: 140, qtd: 1}])",
+          "codigo": [
+            "function topProduto(vendas) {",
+            "  let melhor = vendas[0];",
+            "  for (const venda of vendas) {",
+            "    if (venda.preco * venda.qtd > melhor.preco * melhor.qtd) {",
+            "      melhor = venda;",
+            "    }",
+            "  }",
+            "  return melhor.produto;",
+            "}"
+          ],
+          "passos": [
+            {
+              "linha": 0,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ]
+              ],
+              "fala": "O Criador chama topProduto com uma base de 3 vendas. O melhor é quem tem a maior receita (preço × quantidade)."
+            },
+            {
+              "linha": 1,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "melhor",
+                  "{produto: \"Espada\", preco: 100, qtd: 2}"
+                ]
+              ],
+              "fala": "Elege a primeira venda como a melhor por enquanto: melhor = {produto: \"Espada\", preco: 100, qtd: 2}."
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "melhor",
+                  "{produto: \"Espada\", preco: 100, qtd: 2}"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Espada\", preco: 100, qtd: 2}"
+                ]
+              ],
+              "fala": "O laço pega a próxima venda: venda = {produto: \"Espada\", preco: 100, qtd: 2}."
+            },
+            {
+              "linha": 3,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "melhor",
+                  "{produto: \"Espada\", preco: 100, qtd: 2}"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Espada\", preco: 100, qtd: 2}"
+                ]
+              ],
+              "fala": "A receita desta venda é maior que a da melhor até agora? Não, a melhor continua a mesma."
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "melhor",
+                  "{produto: \"Espada\", preco: 100, qtd: 2}"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Escudo\", preco: 80, qtd: 3}"
+                ]
+              ],
+              "fala": "O laço pega a próxima venda: venda = {produto: \"Escudo\", preco: 80, qtd: 3}."
+            },
+            {
+              "linha": 3,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "melhor",
+                  "{produto: \"Espada\", preco: 100, qtd: 2}"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Escudo\", preco: 80, qtd: 3}"
+                ]
+              ],
+              "fala": "A receita desta venda é maior que a da melhor até agora? Sim, então entra no bloco."
+            },
+            {
+              "linha": 4,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "melhor",
+                  "{produto: \"Escudo\", preco: 80, qtd: 3}"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Escudo\", preco: 80, qtd: 3}"
+                ]
+              ],
+              "fala": "A nova melhor é {produto: \"Escudo\", preco: 80, qtd: 3}.",
+              "dano": true
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "melhor",
+                  "{produto: \"Escudo\", preco: 80, qtd: 3}"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Arco\", preco: 140, qtd: 1}"
+                ]
+              ],
+              "fala": "O laço pega a próxima venda: venda = {produto: \"Arco\", preco: 140, qtd: 1}."
+            },
+            {
+              "linha": 3,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "melhor",
+                  "{produto: \"Escudo\", preco: 80, qtd: 3}"
+                ],
+                [
+                  "venda",
+                  "{produto: \"Arco\", preco: 140, qtd: 1}"
+                ]
+              ],
+              "fala": "A receita desta venda é maior que a da melhor até agora? Não, a melhor continua a mesma."
+            },
+            {
+              "linha": 2,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "melhor",
+                  "{produto: \"Escudo\", preco: 80, qtd: 3}"
+                ]
+              ],
+              "fala": "Acabaram as vendas, então o laço termina."
+            },
+            {
+              "linha": 7,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "melhor",
+                  "{produto: \"Escudo\", preco: 80, qtd: 3}"
+                ]
+              ],
+              "fala": "return devolve o NOME do produto vencedor: \"Escudo\".",
+              "dano": true
+            },
+            {
+              "linha": 7,
+              "vars": [
+                [
+                  "vendas",
+                  "a base (3 vendas)"
+                ],
+                [
+                  "melhor",
+                  "{produto: \"Escudo\", preco: 80, qtd: 3}"
+                ]
+              ],
+              "fala": "Os testes passaram. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "function topProduto(vendas) {\n  let melhor = vendas[0];\n  for (const venda of vendas) {\n    if (venda.preco * venda.___ > melhor.preco * melhor.qtd) {   // qual campo completa a receita?\n      melhor = ___;                                              // quem vira a melhor?\n    }\n  }\n  return melhor.___;                                             // qual campo devolver?\n}\n",
+          "testes": [
+            {
+              "in": [
+                [
+                  {
+                    "produto": "A",
+                    "preco": 10,
+                    "qtd": 1
+                  },
+                  {
+                    "produto": "B",
+                    "preco": 5,
+                    "qtd": 4
+                  }
+                ]
+              ],
+              "out": "B"
+            },
+            {
+              "in": [
+                [
+                  {
+                    "produto": "S",
+                    "preco": 1,
+                    "qtd": 1
+                  }
+                ]
+              ],
+              "out": "S"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "orac-explica": {
+    "conceito": "Um bom prompt diz o quê, para quem e como",
+    "porque": "A IA responde ao que você escreveu, e não ao que você pensou. Um pedido vago ('o que é variável?') recebe uma resposta genérica. Quando você diz a tarefa, para quem é a resposta e como quer receber, ela acerta muito mais.",
+    "analogia": "É como pedir um prato a um cozinheiro: 'faça comida' resulta numa surpresa. 'Faça um macarrão simples, sem pimenta, para uma criança' resulta no prato certo.",
+    "ideias": [
+      {
+        "titulo": "Tarefa clara",
+        "texto": "Comece pelo verbo e pelo assunto: explique, resuma, compare."
+      },
+      {
+        "titulo": "Público",
+        "texto": "Dizer para quem é a resposta muda o vocabulário e o nível de detalhe."
+      },
+      {
+        "titulo": "Exemplo ou analogia",
+        "texto": "Pedir uma analogia faz o conceito ficar fácil de lembrar."
+      }
+    ],
+    "tituloSintaxe": "O que um bom prompt precisa ter",
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "Diga o que quer",
+            "explica": "Comece pela tarefa: 'Explique o que é uma variável'. Sem tarefa clara, a IA adivinha."
+          },
+          {
+            "trecho": "Diga para quem é",
+            "explica": "A mesma explicação muda conforme o leitor. 'Para quem nunca programou' faz a IA evitar termos técnicos."
+          },
+          {
+            "trecho": "Peça uma analogia",
+            "explica": "Uma comparação com o dia a dia ajuda o iniciante a entender sem decorar."
+          },
+          {
+            "trecho": "Dê detalhe",
+            "explica": "Pedido de meia frase deixa a IA adivinhar. Um pouco mais de contexto já melhora a resposta."
+          }
+        ],
+        "demo": {
+          "tipo": "prompt",
+          "entrada": "o prompt",
+          "codigo": [],
+          "requisitos": [
+            "Define o público (iniciante/leigo)",
+            "Pede explicação clara do conceito",
+            "Pede uma analogia ou exemplo",
+            "Tem detalhe suficiente (não é vago)"
+          ],
+          "passos": [
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "",
+              "novo": "",
+              "atende": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "fala": "O prompt começa em branco. O Criador vai montá-lo por partes, e cada parte cumpre um requisito."
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Explique o que é uma variável em programação.",
+              "novo": "Explique o que é uma variável em programação.",
+              "atende": [
+                false,
+                true,
+                false,
+                false
+              ],
+              "fala": "Primeiro a tarefa, bem direta: explicar um conceito. Isso já cumpre o requisito de pedir a explicação.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Explique o que é uma variável em programação. A explicação é para alguém que nunca programou.",
+              "novo": " A explicação é para alguém que nunca programou.",
+              "atende": [
+                true,
+                true,
+                false,
+                true
+              ],
+              "fala": "Agora diz para quem é. Com o público definido, a IA escolhe palavras simples. O prompt também já tem detalhe suficiente.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Explique o que é uma variável em programação. A explicação é para alguém que nunca programou. Use uma analogia do dia a dia, como se a variável fosse uma caixinha com etiqueta.",
+              "novo": " Use uma analogia do dia a dia, como se a variável fosse uma caixinha com etiqueta.",
+              "atende": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "fala": "Por fim, pede uma analogia, e até sugere uma. Quanto mais específico o pedido, melhor a resposta.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Explique o que é uma variável em programação. A explicação é para alguém que nunca programou. Use uma analogia do dia a dia, como se a variável fosse uma caixinha com etiqueta.",
+              "novo": "",
+              "atende": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "fala": "O prompt atende a tudo. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "Explique o que é uma ___ em programação. A explicação é para alguém que ___. Use uma ___ do dia a dia para ilustrar."
+        }
+      }
+    }
+  },
+  "orac-resumo": {
+    "conceito": "Tamanho e formato: tire a ambiguidade",
+    "porque": "'Resuma isso' é um pedido ambíguo: um resumo pode ter uma frase ou uma página, em parágrafo ou em lista. Quando você define o tamanho e o formato, a IA entrega exatamente o que cabe no seu uso.",
+    "analogia": "É como pedir ao motorista de aplicativo: 'me leve para lá' não funciona. Com endereço e horário, ele chega ao lugar certo na hora certa.",
+    "ideias": [
+      {
+        "titulo": "Limite de tamanho",
+        "texto": "Diga quanto: no máximo 3 frases, 50 palavras, 5 tópicos."
+      },
+      {
+        "titulo": "Formato da saída",
+        "texto": "Diga como: em tópicos, em tabela, em um parágrafo."
+      },
+      {
+        "titulo": "Menos retrabalho",
+        "texto": "Definir antes evita pedir para refazer depois."
+      }
+    ],
+    "tituloSintaxe": "O que um bom prompt precisa ter",
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "Peça a ação",
+            "explica": "O verbo importa: 'resuma' e 'sintetize' deixam claro o que fazer com o texto."
+          },
+          {
+            "trecho": "Defina o tamanho",
+            "explica": "Limites como 'no máximo 3 frases' ou 'em até 50 palavras' impedem respostas longas demais."
+          },
+          {
+            "trecho": "Defina o formato",
+            "explica": "Tópicos, tabela e parágrafo são formatos diferentes. Escolha o que você vai usar."
+          }
+        ],
+        "demo": {
+          "tipo": "prompt",
+          "entrada": "o prompt",
+          "codigo": [],
+          "requisitos": [
+            "Pede o resumo explicitamente",
+            "Define tamanho/limite",
+            "Define o formato da saída",
+            "Tem detalhe suficiente"
+          ],
+          "passos": [
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "",
+              "novo": "",
+              "atende": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "fala": "O prompt começa em branco. Repare como cada parte tira uma dúvida da IA."
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Resuma o texto abaixo.",
+              "novo": "Resuma o texto abaixo.",
+              "atende": [
+                true,
+                false,
+                false,
+                false
+              ],
+              "fala": "A tarefa: resumir. Mas ainda não diz quanto nem como, e a IA teria que adivinhar.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Resuma o texto abaixo. O resumo deve ter no máximo 3 frases.",
+              "novo": " O resumo deve ter no máximo 3 frases.",
+              "atende": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "fala": "Agora o tamanho está definido: no máximo 3 frases. Isso também começa a fixar o formato.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Resuma o texto abaixo. O resumo deve ter no máximo 3 frases. Escreva o resumo em tópicos curtos, um por ideia principal.",
+              "novo": " Escreva o resumo em tópicos curtos, um por ideia principal.",
+              "atende": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "fala": "E o formato fica explícito: tópicos curtos, um para cada ideia. A resposta vem pronta para usar."
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Resuma o texto abaixo. O resumo deve ter no máximo 3 frases. Escreva o resumo em tópicos curtos, um por ideia principal.",
+              "novo": "",
+              "atende": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "fala": "O prompt atende a tudo. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "___ o texto abaixo em, no máximo, ___ frases. Entregue o resultado em ___, um por ideia principal."
+        }
+      }
+    }
+  },
+  "orac-exame-e": {
+    "conceito": "As cinco partes de um prompt forte",
+    "porque": "Para tarefas maiores, um prompt forte combina cinco partes: um papel para a IA, o contexto da situação, as restrições, o formato da resposta e um exemplo do que você espera. Faltando uma, a IA preenche o espaço com suposições.",
+    "analogia": "É como um briefing para uma agência: quem vai fazer o trabalho (papel), para quem e por quê (contexto), o que não pode (restrições), como entregar (formato) e uma referência do que você gosta (exemplo).",
+    "ideias": [
+      {
+        "titulo": "Papel",
+        "texto": "'Aja como um designer web' muda o jeito de a IA pensar e responder."
+      },
+      {
+        "titulo": "Contexto e restrições",
+        "texto": "Quanto mais claro o cenário e os limites, menos suposição."
+      },
+      {
+        "titulo": "Formato e exemplo",
+        "texto": "Mostrar a forma da resposta quase elimina mal-entendidos."
+      }
+    ],
+    "tituloSintaxe": "O que um bom prompt precisa ter",
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "Papel",
+            "explica": "Comece com 'Aja como...' ou 'Você é um...' e diga a especialidade."
+          },
+          {
+            "trecho": "Contexto",
+            "explica": "Quem é a pessoa, o que quer conseguir e para quem a página se destina."
+          },
+          {
+            "trecho": "Restrições",
+            "explica": "O que usar e o que evitar: tecnologias, idioma, tamanho."
+          },
+          {
+            "trecho": "Formato da saída",
+            "explica": "Como você quer receber: um arquivo, uma lista, blocos de código."
+          },
+          {
+            "trecho": "Exemplo",
+            "explica": "Uma amostra curta da estrutura esperada alinha a IA com o que você imagina."
+          }
+        ],
+        "demo": {
+          "tipo": "prompt",
+          "entrada": "o prompt",
+          "codigo": [],
+          "requisitos": [
+            "Dá um papel/persona à IA",
+            "Dá contexto suficiente",
+            "Define restrições",
+            "Define o formato da saída",
+            "Inclui um exemplo"
+          ],
+          "passos": [
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "",
+              "novo": "",
+              "atende": [
+                false,
+                false,
+                false,
+                false,
+                false
+              ],
+              "fala": "O prompt começa em branco. Vamos construir as cinco partes, uma de cada vez."
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Aja como um designer web experiente.",
+              "novo": "Aja como um designer web experiente.",
+              "atende": [
+                true,
+                false,
+                false,
+                false,
+                false
+              ],
+              "fala": "Parte 1, o papel. Isso coloca a IA no ponto de vista de quem entende do assunto.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Aja como um designer web experiente. Crie a página de portfólio pessoal de uma estudante de Engenharia de Software que quer mostrar seus projetos para recrutadores, com seções sobre ela, projetos e contato.",
+              "novo": " Crie a página de portfólio pessoal de uma estudante de Engenharia de Software que quer mostrar seus projetos para recrutadores, com seções sobre ela, projetos e contato.",
+              "atende": [
+                true,
+                true,
+                false,
+                false,
+                false
+              ],
+              "fala": "Parte 2, o contexto: quem é a pessoa, o que ela quer e quem vai ler. Agora a IA sabe o objetivo da página.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Aja como um designer web experiente. Crie a página de portfólio pessoal de uma estudante de Engenharia de Software que quer mostrar seus projetos para recrutadores, com seções sobre ela, projetos e contato. Restrições: use apenas HTML e CSS, sem JavaScript, e escreva os textos em português.",
+              "novo": " Restrições: use apenas HTML e CSS, sem JavaScript, e escreva os textos em português.",
+              "atende": [
+                true,
+                true,
+                true,
+                false,
+                false
+              ],
+              "fala": "Parte 3, as restrições: o que pode e o que não pode. Isso evita surpresas na entrega.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Aja como um designer web experiente. Crie a página de portfólio pessoal de uma estudante de Engenharia de Software que quer mostrar seus projetos para recrutadores, com seções sobre ela, projetos e contato. Restrições: use apenas HTML e CSS, sem JavaScript, e escreva os textos em português. Entregue o resultado em um único arquivo, com o código em um bloco e comentários em cada seção.",
+              "novo": " Entregue o resultado em um único arquivo, com o código em um bloco e comentários em cada seção.",
+              "atende": [
+                true,
+                true,
+                true,
+                true,
+                false
+              ],
+              "fala": "Parte 4, o formato: como você quer receber a resposta.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Aja como um designer web experiente. Crie a página de portfólio pessoal de uma estudante de Engenharia de Software que quer mostrar seus projetos para recrutadores, com seções sobre ela, projetos e contato. Restrições: use apenas HTML e CSS, sem JavaScript, e escreva os textos em português. Entregue o resultado em um único arquivo, com o código em um bloco e comentários em cada seção. Exemplo da estrutura esperada: cabeçalho com nome, lista de projetos e rodapé com contatos.",
+              "novo": " Exemplo da estrutura esperada: cabeçalho com nome, lista de projetos e rodapé com contatos.",
+              "atende": [
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              "fala": "Parte 5, o exemplo: uma amostra da estrutura que você imagina. Agora as cinco partes estão no prompt.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Aja como um designer web experiente. Crie a página de portfólio pessoal de uma estudante de Engenharia de Software que quer mostrar seus projetos para recrutadores, com seções sobre ela, projetos e contato. Restrições: use apenas HTML e CSS, sem JavaScript, e escreva os textos em português. Entregue o resultado em um único arquivo, com o código em um bloco e comentários em cada seção. Exemplo da estrutura esperada: cabeçalho com nome, lista de projetos e rodapé com contatos.",
+              "novo": "",
+              "atende": [
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              "fala": "O prompt atende a tudo. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "___ como um designer web experiente.\nCrie a página de portfólio pessoal de uma estudante de Engenharia de Software que quer mostrar seus projetos para recrutadores, com seções sobre ela, projetos e contato.\nRestrições: use ___ HTML e CSS, sem JavaScript, e escreva os textos em português.\nEntregue o resultado em um único arquivo, com o código separado por ___.\n___ da estrutura esperada: cabeçalho com nome, lista de projetos e rodapé com contatos."
+        }
+      }
+    }
+  },
+  "orac-imagem": {
+    "conceito": "Prompt de imagem: assunto, estilo, cores e enquadramento",
+    "porque": "IAs de imagem precisam de mais descrição visual do que de texto: sem estilo, cores e enquadramento, cada tentativa sai diferente. Um bom prompt de imagem funciona como direção de arte.",
+    "analogia": "É como encomendar uma ilustração a um artista: você diz o que quer ver (assunto), em que estilo, com que cores e como a cena é vista. Sem isso, o artista escolhe tudo sozinho.",
+    "ideias": [
+      {
+        "titulo": "Assunto",
+        "texto": "O que aparece na imagem, descrito com detalhes concretos."
+      },
+      {
+        "titulo": "Estilo e cores",
+        "texto": "Pixel art, 16 bits, paleta escura, tons de azul. Palavras visuais guiam o resultado."
+      },
+      {
+        "titulo": "Enquadramento e fundo",
+        "texto": "De frente, corpo inteiro, fundo transparente: facilita usar a arte depois."
+      }
+    ],
+    "tituloSintaxe": "O que um bom prompt precisa ter",
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "Assunto",
+            "explica": "Quem ou o quê, e o que está fazendo. Quanto mais concreto, melhor."
+          },
+          {
+            "trecho": "Estilo",
+            "explica": "Nomeie o estilo: pixel art, 16 bits, aquarela, desenho de quadrinhos."
+          },
+          {
+            "trecho": "Cores",
+            "explica": "Cite a paleta e os tons dominantes. 'Neon ciano' diz mais que 'colorido'."
+          },
+          {
+            "trecho": "Enquadramento e fundo",
+            "explica": "Como a cena é vista e o que há atrás do personagem."
+          }
+        ],
+        "demo": {
+          "tipo": "prompt",
+          "entrada": "o prompt",
+          "codigo": [],
+          "requisitos": [
+            "Descreve o assunto da imagem",
+            "Define o estilo (pixel art/8-bit etc.)",
+            "Fala de cores/paleta",
+            "Define enquadramento ou fundo"
+          ],
+          "passos": [
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "",
+              "novo": "",
+              "atende": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "fala": "O prompt começa em branco. Numa imagem, cada detalhe visual precisa ser dito."
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Um dragão de pedra com olhos brilhantes guardando a entrada de uma masmorra.",
+              "novo": "Um dragão de pedra com olhos brilhantes guardando a entrada de uma masmorra.",
+              "atende": [
+                true,
+                false,
+                false,
+                false
+              ],
+              "fala": "O assunto, com detalhes concretos: de pedra, olhos brilhantes, guardando uma entrada.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Um dragão de pedra com olhos brilhantes guardando a entrada de uma masmorra. Estilo pixel art de 16 bits, como em jogos de RPG clássicos.",
+              "novo": " Estilo pixel art de 16 bits, como em jogos de RPG clássicos.",
+              "atende": [
+                true,
+                true,
+                false,
+                false
+              ],
+              "fala": "O estilo nomeado. Sem isso, a IA escolheria um estilo qualquer.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Um dragão de pedra com olhos brilhantes guardando a entrada de uma masmorra. Estilo pixel art de 16 bits, como em jogos de RPG clássicos. Paleta de cores escura, com tons de azul e detalhes em neon ciano.",
+              "novo": " Paleta de cores escura, com tons de azul e detalhes em neon ciano.",
+              "atende": [
+                true,
+                true,
+                true,
+                false
+              ],
+              "fala": "As cores: paleta escura e um detalhe em neon que chama a atenção.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Um dragão de pedra com olhos brilhantes guardando a entrada de uma masmorra. Estilo pixel art de 16 bits, como em jogos de RPG clássicos. Paleta de cores escura, com tons de azul e detalhes em neon ciano. Vista de frente, corpo inteiro, sobre fundo transparente.",
+              "novo": " Vista de frente, corpo inteiro, sobre fundo transparente.",
+              "atende": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "fala": "O enquadramento e o fundo. O fundo transparente deixa usar a arte em qualquer cenário.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Um dragão de pedra com olhos brilhantes guardando a entrada de uma masmorra. Estilo pixel art de 16 bits, como em jogos de RPG clássicos. Paleta de cores escura, com tons de azul e detalhes em neon ciano. Vista de frente, corpo inteiro, sobre fundo transparente.",
+              "novo": "",
+              "atende": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "fala": "O prompt atende a tudo. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "Um dragão de pedra com olhos brilhantes guardando a entrada de uma masmorra. ___ pixel art de 16 bits. Paleta de ___ escura, com detalhes em neon. ___ de frente, corpo inteiro, sobre fundo transparente."
+        }
+      }
+    }
+  },
+  "orac-persona": {
+    "conceito": "Persona: quem a IA é, como fala e o que evita",
+    "porque": "Dar uma personalidade à IA muda o jeito como ela ajuda. Uma persona bem definida diz quem ela é, em que tom fala e o que ela não deve fazer. Para um tutor, o mais importante é evitar entregar a resposta pronta.",
+    "analogia": "É como contratar um professor: você diz a matéria (quem é), pede que seja paciente e bem-humorado (como fala) e combina que ele ajude o aluno a pensar, em vez de dar a resposta (limite).",
+    "ideias": [
+      {
+        "titulo": "Quem é",
+        "texto": "A identidade e a especialidade da IA."
+      },
+      {
+        "titulo": "Como fala",
+        "texto": "O tom: amigável, formal, paciente, bem-humorado."
+      },
+      {
+        "titulo": "O que evita",
+        "texto": "Uma restrição de comportamento, para ela não sair do papel."
+      }
+    ],
+    "tituloSintaxe": "O que um bom prompt precisa ter",
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "Quem é",
+            "explica": "'Você é um tutor de programação chamado Zé.' Dê nome e função."
+          },
+          {
+            "trecho": "Tom de voz",
+            "explica": "Escolha como a persona fala: amigável, paciente, com bom humor."
+          },
+          {
+            "trecho": "Restrição",
+            "explica": "Diga o que evitar. Num tutor: não entregar a resposta pronta."
+          }
+        ],
+        "demo": {
+          "tipo": "prompt",
+          "entrada": "o prompt",
+          "codigo": [],
+          "requisitos": [
+            "Define o papel/persona",
+            "Define o tom/estilo de fala",
+            "Define uma restrição de comportamento",
+            "Tem detalhe suficiente"
+          ],
+          "passos": [
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "",
+              "novo": "",
+              "atende": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "fala": "O prompt começa em branco. Vamos criar um personagem para a IA interpretar."
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Você é um tutor de programação chamado Zé.",
+              "novo": "Você é um tutor de programação chamado Zé.",
+              "atende": [
+                true,
+                false,
+                false,
+                false
+              ],
+              "fala": "A identidade: um tutor com nome. Isso dá um papel claro à IA.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Você é um tutor de programação chamado Zé. Fale num tom amigável e paciente, com bom humor, usando exemplos do dia a dia.",
+              "novo": " Fale num tom amigável e paciente, com bom humor, usando exemplos do dia a dia.",
+              "atende": [
+                true,
+                true,
+                false,
+                true
+              ],
+              "fala": "O tom de voz. Agora ela sabe como se comunicar, e o prompt já tem corpo suficiente.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Você é um tutor de programação chamado Zé. Fale num tom amigável e paciente, com bom humor, usando exemplos do dia a dia. Evite entregar a resposta pronta: faça perguntas que levem o aluno a descobrir sozinho.",
+              "novo": " Evite entregar a resposta pronta: faça perguntas que levem o aluno a descobrir sozinho.",
+              "atende": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "fala": "A restrição de comportamento. É ela que mantém o tutor útil para quem está aprendendo.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Você é um tutor de programação chamado Zé. Fale num tom amigável e paciente, com bom humor, usando exemplos do dia a dia. Evite entregar a resposta pronta: faça perguntas que levem o aluno a descobrir sozinho.",
+              "novo": "",
+              "atende": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "fala": "O prompt atende a tudo. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "___ um tutor de programação chamado Zé. Fale num ___ amigável e paciente, com bom humor. ___ entregar a resposta pronta: faça perguntas que levem o aluno a descobrir sozinho."
+        }
+      }
+    }
+  },
+  "orac-exame-d": {
+    "conceito": "Blindar o prompt contra respostas erradas",
+    "porque": "Quando o prompt é frouxo, a IA 'alucina': inventa regras, bibliotecas ou resultados que parecem certos. Para código, a defesa é ser específico: dizer o algoritmo, proibir invenções, pedir um formato conferível e mostrar um exemplo de entrada e saída para ela se testar.",
+    "analogia": "É como passar uma tarefa a um estagiário esperto, mas que nunca admite que não sabe: você precisa dizer exatamente a regra, o que não pode fazer e mostrar um caso resolvido, para ele não inventar.",
+    "ideias": [
+      {
+        "titulo": "Alucinação",
+        "texto": "Resposta que parece confiável, mas foi inventada. Cresce quando o pedido é vago."
+      },
+      {
+        "titulo": "Regras explícitas",
+        "texto": "Cite o algoritmo e proíba inventar o que não foi pedido."
+      },
+      {
+        "titulo": "Exemplo de entrada e saída",
+        "texto": "Dois casos conhecidos permitem conferir se a resposta está certa."
+      }
+    ],
+    "tituloSintaxe": "O que um bom prompt precisa ter",
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "Papel",
+            "explica": "Um especialista na área: 'engenheiro de software sênior em validação de dados'."
+          },
+          {
+            "trecho": "Contexto técnico",
+            "explica": "Linguagem, o que a função deve conferir, casos a rejeitar e o algoritmo a seguir."
+          },
+          {
+            "trecho": "Restrições",
+            "explica": "Sem bibliotecas externas, sem inventar regras, idioma da resposta."
+          },
+          {
+            "trecho": "Formato",
+            "explica": "Como entregar: primeiro o código, depois uma lista explicando cada passo."
+          },
+          {
+            "trecho": "Exemplo",
+            "explica": "Um valor válido e um inválido, com o resultado esperado de cada um."
+          }
+        ],
+        "demo": {
+          "tipo": "prompt",
+          "entrada": "o prompt",
+          "codigo": [],
+          "requisitos": [
+            "Dá um papel/persona à IA",
+            "Dá contexto técnico claro",
+            "Define restrições/regras",
+            "Define o formato da saída",
+            "Inclui exemplo de entrada/saída"
+          ],
+          "passos": [
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "",
+              "novo": "",
+              "atende": [
+                false,
+                false,
+                false,
+                false,
+                false
+              ],
+              "fala": "O prompt começa em branco. Cada parte fecha uma porta para a alucinação."
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Aja como um engenheiro de software sênior especialista em validação de dados.",
+              "novo": "Aja como um engenheiro de software sênior especialista em validação de dados.",
+              "atende": [
+                true,
+                false,
+                false,
+                true,
+                false
+              ],
+              "fala": "O papel: um especialista. Isso ancora a IA num jeito rigoroso de trabalhar.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Aja como um engenheiro de software sênior especialista em validação de dados. Escreva uma função em JavaScript que valide um CPF brasileiro: deve conferir os 11 dígitos, rejeitar sequências repetidas como 111.111.111-11 e calcular os dois dígitos verificadores com o algoritmo oficial.",
+              "novo": " Escreva uma função em JavaScript que valide um CPF brasileiro: deve conferir os 11 dígitos, rejeitar sequências repetidas como 111.111.111-11 e calcular os dois dígitos verificadores com o algoritmo oficial.",
+              "atende": [
+                true,
+                true,
+                false,
+                true,
+                false
+              ],
+              "fala": "O contexto técnico: linguagem, o que conferir e qual algoritmo usar. Quanto mais exato, menos espaço para inventar.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Aja como um engenheiro de software sênior especialista em validação de dados. Escreva uma função em JavaScript que valide um CPF brasileiro: deve conferir os 11 dígitos, rejeitar sequências repetidas como 111.111.111-11 e calcular os dois dígitos verificadores com o algoritmo oficial. Restrições: não use bibliotecas externas, não invente regras além das do algoritmo e responda em português.",
+              "novo": " Restrições: não use bibliotecas externas, não invente regras além das do algoritmo e responda em português.",
+              "atende": [
+                true,
+                true,
+                true,
+                true,
+                false
+              ],
+              "fala": "As restrições fecham a porta para invenções: nada de bibliotecas misteriosas nem regras novas.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Aja como um engenheiro de software sênior especialista em validação de dados. Escreva uma função em JavaScript que valide um CPF brasileiro: deve conferir os 11 dígitos, rejeitar sequências repetidas como 111.111.111-11 e calcular os dois dígitos verificadores com o algoritmo oficial. Restrições: não use bibliotecas externas, não invente regras além das do algoritmo e responda em português. Formato da saída: primeiro o código da função e depois uma lista curta explicando cada passo.",
+              "novo": " Formato da saída: primeiro o código da função e depois uma lista curta explicando cada passo.",
+              "atende": [
+                true,
+                true,
+                true,
+                true,
+                false
+              ],
+              "fala": "O formato facilita conferir: o código separado da explicação."
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Aja como um engenheiro de software sênior especialista em validação de dados. Escreva uma função em JavaScript que valide um CPF brasileiro: deve conferir os 11 dígitos, rejeitar sequências repetidas como 111.111.111-11 e calcular os dois dígitos verificadores com o algoritmo oficial. Restrições: não use bibliotecas externas, não invente regras além das do algoritmo e responda em português. Formato da saída: primeiro o código da função e depois uma lista curta explicando cada passo. Exemplo de entrada e saída: validaCpf('529.982.247-25') devolve true e validaCpf('111.111.111-11') devolve false.",
+              "novo": " Exemplo de entrada e saída: validaCpf('529.982.247-25') devolve true e validaCpf('111.111.111-11') devolve false.",
+              "atende": [
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              "fala": "O exemplo com entrada e saída é o teste que a IA pode aplicar na própria resposta.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Aja como um engenheiro de software sênior especialista em validação de dados. Escreva uma função em JavaScript que valide um CPF brasileiro: deve conferir os 11 dígitos, rejeitar sequências repetidas como 111.111.111-11 e calcular os dois dígitos verificadores com o algoritmo oficial. Restrições: não use bibliotecas externas, não invente regras além das do algoritmo e responda em português. Formato da saída: primeiro o código da função e depois uma lista curta explicando cada passo. Exemplo de entrada e saída: validaCpf('529.982.247-25') devolve true e validaCpf('111.111.111-11') devolve false.",
+              "novo": "",
+              "atende": [
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              "fala": "O prompt atende a tudo. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "___ como um engenheiro de software sênior especialista em validação de dados.\nEscreva uma função em JavaScript que valide um CPF brasileiro: deve conferir os 11 dígitos, rejeitar sequências repetidas como 111.111.111-11 e calcular os dois dígitos verificadores com o algoritmo oficial.\nRestrições: ___ use bibliotecas externas e não invente regras além das do algoritmo.\nFormato da saída: primeiro o código da função e depois uma ___ curta explicando cada passo.\n___ de entrada e saída: validaCpf('529.982.247-25') devolve true e validaCpf('111.111.111-11') devolve false."
+        }
+      }
+    }
+  },
+  "orac-cot": {
+    "conceito": "Pedir o raciocínio passo a passo",
+    "porque": "Em problemas de lógica ou de conta, a IA erra menos quando é levada a raciocinar antes de responder. Pedir o passo a passo faz com que cada etapa apoie a próxima, e pedir a resposta final separada deixa fácil encontrar o resultado.",
+    "analogia": "É como pedir a um aluno que mostre os cálculos na prova: ao escrever cada etapa, ele percebe erros no meio do caminho. A resposta final destacada é só o fechamento.",
+    "ideias": [
+      {
+        "titulo": "Raciocínio explícito",
+        "texto": "Pedir etapas faz a IA 'pensar em voz alta' e errar menos."
+      },
+      {
+        "titulo": "Resposta final separada",
+        "texto": "Uma linha fixa, como 'Resposta:', facilita achar e conferir o resultado."
+      },
+      {
+        "titulo": "Tarefa clara",
+        "texto": "O problema precisa estar completo, com todos os números e a pergunta."
+      }
+    ],
+    "tituloSintaxe": "O que um bom prompt precisa ter",
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "Descreva o problema",
+            "explica": "Inclua todos os dados e a pergunta exata. Faltando algo, a IA completa por conta própria."
+          },
+          {
+            "trecho": "Peça o passo a passo",
+            "explica": "'Pense passo a passo, escrevendo cada etapa antes de responder.'"
+          },
+          {
+            "trecho": "Separe a resposta final",
+            "explica": "Peça que a conclusão apareça à parte, numa linha reconhecível."
+          }
+        ],
+        "demo": {
+          "tipo": "prompt",
+          "entrada": "o prompt",
+          "codigo": [],
+          "requisitos": [
+            "Pede raciocínio passo a passo",
+            "Pede a resposta final separada",
+            "Descreve a tarefa com clareza"
+          ],
+          "passos": [
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "",
+              "novo": "",
+              "atende": [
+                false,
+                false,
+                false
+              ],
+              "fala": "O prompt começa em branco. Vamos descrever o problema e depois guiar o raciocínio."
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Um trem sai da cidade A às 8h a 60 km/h e outro sai da cidade B, a 300 km de distância, às 9h a 90 km/h, vindo ao encontro do primeiro. Quando e onde eles se encontram?",
+              "novo": "Um trem sai da cidade A às 8h a 60 km/h e outro sai da cidade B, a 300 km de distância, às 9h a 90 km/h, vindo ao encontro do primeiro. Quando e onde eles se encontram?",
+              "atende": [
+                false,
+                false,
+                true
+              ],
+              "fala": "Primeiro o problema, completo: todos os números e a pergunta. A tarefa está clara.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Um trem sai da cidade A às 8h a 60 km/h e outro sai da cidade B, a 300 km de distância, às 9h a 90 km/h, vindo ao encontro do primeiro. Quando e onde eles se encontram? Pense passo a passo, escrevendo cada etapa do raciocínio antes de responder.",
+              "novo": " Pense passo a passo, escrevendo cada etapa do raciocínio antes de responder.",
+              "atende": [
+                true,
+                false,
+                true
+              ],
+              "fala": "Agora pede o raciocínio por etapas. É isso que reduz os erros de conta.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Um trem sai da cidade A às 8h a 60 km/h e outro sai da cidade B, a 300 km de distância, às 9h a 90 km/h, vindo ao encontro do primeiro. Quando e onde eles se encontram? Pense passo a passo, escrevendo cada etapa do raciocínio antes de responder. No final, dê a resposta final separada, em uma linha começando com 'Resposta:'.",
+              "novo": " No final, dê a resposta final separada, em uma linha começando com 'Resposta:'.",
+              "atende": [
+                true,
+                true,
+                true
+              ],
+              "fala": "E pede a conclusão separada, numa linha fácil de achar e conferir.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Um trem sai da cidade A às 8h a 60 km/h e outro sai da cidade B, a 300 km de distância, às 9h a 90 km/h, vindo ao encontro do primeiro. Quando e onde eles se encontram? Pense passo a passo, escrevendo cada etapa do raciocínio antes de responder. No final, dê a resposta final separada, em uma linha começando com 'Resposta:'.",
+              "novo": "",
+              "atende": [
+                true,
+                true,
+                true
+              ],
+              "fala": "O prompt atende a tudo. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "Um trem sai da cidade A às 8h a 60 km/h e outro sai da cidade B, a 300 km de distância, às 9h a 90 km/h, vindo ao encontro do primeiro. Quando e onde eles se encontram?\n___ passo a passo, escrevendo cada etapa do raciocínio antes de responder.\nNo ___, dê a resposta final separada, em uma linha começando com 'Resposta:'."
+        }
+      }
+    }
+  },
+  "orac-exame-c": {
+    "conceito": "Saída estruturada: quando um sistema lê a resposta",
+    "porque": "Quando um programa vai ler a resposta da IA, ela precisa vir num formato exato, como JSON com campos definidos. Qualquer texto a mais ('Claro! Aqui está...') quebra a leitura. Por isso o prompt exige a estrutura e proíbe tudo além dela.",
+    "analogia": "É como preencher um formulário de sistema: cada campo no seu lugar, sem comentários nas margens. Se alguém escreve um recado no meio, o sistema recusa o formulário.",
+    "ideias": [
+      {
+        "titulo": "Formato estruturado",
+        "texto": "JSON com campos nomeados que um programa consegue ler."
+      },
+      {
+        "titulo": "Só a estrutura",
+        "texto": "Proibir textos antes e depois evita erros de leitura."
+      },
+      {
+        "titulo": "Exemplo da estrutura",
+        "texto": "Mostrar o JSON esperado fixa nomes e tipos dos campos."
+      }
+    ],
+    "tituloSintaxe": "O que um bom prompt precisa ter",
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "Papel",
+            "explica": "Algo como 'gerador de dados', que reforça o tom técnico."
+          },
+          {
+            "trecho": "Contexto",
+            "explica": "O que gerar e com quais informações."
+          },
+          {
+            "trecho": "Formato estruturado",
+            "explica": "Peça JSON e liste os campos, com os nomes exatos."
+          },
+          {
+            "trecho": "Restrições",
+            "explica": "'Responda apenas com o JSON, sem texto antes ou depois.'"
+          },
+          {
+            "trecho": "Exemplo da estrutura",
+            "explica": "Um JSON de amostra, com os nomes e os tipos de cada campo."
+          }
+        ],
+        "demo": {
+          "tipo": "prompt",
+          "entrada": "o prompt",
+          "codigo": [],
+          "requisitos": [
+            "Dá um papel/persona à IA",
+            "Exige formato estruturado (JSON/campos)",
+            "Define restrições (só o formato, nada além)",
+            "Dá contexto suficiente",
+            "Mostra um exemplo da estrutura"
+          ],
+          "passos": [
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "",
+              "novo": "",
+              "atende": [
+                false,
+                false,
+                false,
+                false,
+                false
+              ],
+              "fala": "O prompt começa em branco. Aqui a resposta vai ser lida por um programa, então precisa ser exata."
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Você é um gerador de dados para um jogo de RPG.",
+              "novo": "Você é um gerador de dados para um jogo de RPG.",
+              "atende": [
+                true,
+                false,
+                false,
+                false,
+                false
+              ],
+              "fala": "O papel: um gerador, e não um conversador. Isso empurra a IA para respostas diretas.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Você é um gerador de dados para um jogo de RPG. Crie um personagem fictício com nome, classe, nível e uma frase de apresentação, no estilo de fantasia medieval.",
+              "novo": " Crie um personagem fictício com nome, classe, nível e uma frase de apresentação, no estilo de fantasia medieval.",
+              "atende": [
+                true,
+                false,
+                false,
+                true,
+                false
+              ],
+              "fala": "O contexto: o que gerar e com quais informações.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Você é um gerador de dados para um jogo de RPG. Crie um personagem fictício com nome, classe, nível e uma frase de apresentação, no estilo de fantasia medieval. Responda em JSON com os campos nome, classe, nivel e frase.",
+              "novo": " Responda em JSON com os campos nome, classe, nivel e frase.",
+              "atende": [
+                true,
+                true,
+                false,
+                true,
+                false
+              ],
+              "fala": "O formato estruturado: JSON e os nomes exatos dos campos.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Você é um gerador de dados para um jogo de RPG. Crie um personagem fictício com nome, classe, nível e uma frase de apresentação, no estilo de fantasia medieval. Responda em JSON com os campos nome, classe, nivel e frase. Restrições: responda apenas com o JSON, sem nenhum texto antes ou depois.",
+              "novo": " Restrições: responda apenas com o JSON, sem nenhum texto antes ou depois.",
+              "atende": [
+                true,
+                true,
+                true,
+                true,
+                false
+              ],
+              "fala": "A restrição que protege o sistema: nada além da estrutura.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Você é um gerador de dados para um jogo de RPG. Crie um personagem fictício com nome, classe, nível e uma frase de apresentação, no estilo de fantasia medieval. Responda em JSON com os campos nome, classe, nivel e frase. Restrições: responda apenas com o JSON, sem nenhum texto antes ou depois. Exemplo da estrutura: {\"nome\": \"Aria\", \"classe\": \"Maga\", \"nivel\": 3, \"frase\": \"A magia mora nos detalhes.\"}",
+              "novo": " Exemplo da estrutura: {\"nome\": \"Aria\", \"classe\": \"Maga\", \"nivel\": 3, \"frase\": \"A magia mora nos detalhes.\"}",
+              "atende": [
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              "fala": "O exemplo da estrutura fixa nomes e tipos. Agora o sistema pode ler a resposta sem surpresas.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Você é um gerador de dados para um jogo de RPG. Crie um personagem fictício com nome, classe, nível e uma frase de apresentação, no estilo de fantasia medieval. Responda em JSON com os campos nome, classe, nivel e frase. Restrições: responda apenas com o JSON, sem nenhum texto antes ou depois. Exemplo da estrutura: {\"nome\": \"Aria\", \"classe\": \"Maga\", \"nivel\": 3, \"frase\": \"A magia mora nos detalhes.\"}",
+              "novo": "",
+              "atende": [
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              "fala": "O prompt atende a tudo. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "___ um gerador de dados para um jogo de RPG.\nCrie um personagem fictício com nome, classe, nível e uma frase de apresentação, no estilo de fantasia medieval.\nResponda em ___ com os campos nome, classe, nivel e frase.\nRestrições: responda ___ com o JSON, sem nenhum texto antes ou depois.\n___ da estrutura: {\"nome\": \"Aria\", \"classe\": \"Maga\", \"nivel\": 3, \"frase\": \"A magia mora nos detalhes.\"}"
+        }
+      }
+    }
+  },
+  "orac-refino": {
+    "conceito": "Pedir para a IA criticar e melhorar a própria resposta",
+    "porque": "A primeira resposta raramente é a melhor. Você pode pedir que a IA escreva, avalie o próprio texto segundo um critério e entregue uma versão melhorada. É uma revisão automática dentro do mesmo pedido.",
+    "analogia": "É como escrever um trabalho e reler antes de entregar, com uma lista de conferência na mão: claro? conciso? correto? Corrigido o que falhou, só então você entrega.",
+    "ideias": [
+      {
+        "titulo": "Refinar",
+        "texto": "Pedir 'avalie e melhore' transforma um rascunho numa versão final."
+      },
+      {
+        "titulo": "Critério de qualidade",
+        "texto": "Sem critério, melhorar é vago. Diga o que conta: claro, conciso, correto."
+      },
+      {
+        "titulo": "Entregar só a versão final",
+        "texto": "Peça apenas o texto melhorado, para não receber os dois."
+      }
+    ],
+    "tituloSintaxe": "O que um bom prompt precisa ter",
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "Descreva a tarefa",
+            "explica": "O que escrever e para quem, com detalhe suficiente."
+          },
+          {
+            "trecho": "Defina o critério",
+            "explica": "Diga pelo que a resposta será julgada: clareza, concisão, correção."
+          },
+          {
+            "trecho": "Peça o refinamento",
+            "explica": "'Em seguida, melhore o texto' faz a IA aplicar a própria crítica."
+          }
+        ],
+        "demo": {
+          "tipo": "prompt",
+          "entrada": "o prompt",
+          "codigo": [],
+          "requisitos": [
+            "Pede para refinar/melhorar a própria resposta",
+            "Define um critério de qualidade",
+            "Descreve a tarefa com clareza"
+          ],
+          "passos": [
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "",
+              "novo": "",
+              "atende": [
+                false,
+                false,
+                false
+              ],
+              "fala": "O prompt começa em branco. A ideia é pedir uma resposta, a crítica e a versão melhor, tudo de uma vez."
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Escreva uma explicação curta sobre o que é recursão em programação para estudantes do primeiro período.",
+              "novo": "Escreva uma explicação curta sobre o que é recursão em programação para estudantes do primeiro período.",
+              "atende": [
+                false,
+                false,
+                true
+              ],
+              "fala": "A tarefa, descrita com clareza: o que explicar e para quem.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Escreva uma explicação curta sobre o que é recursão em programação para estudantes do primeiro período. Depois de escrever, avalie a própria resposta segundo este critério: ela está clara e concisa?",
+              "novo": " Depois de escrever, avalie a própria resposta segundo este critério: ela está clara e concisa?",
+              "atende": [
+                false,
+                true,
+                true
+              ],
+              "fala": "O critério de qualidade: clara e concisa. Agora a IA sabe pelo que a sua resposta vai ser julgada.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Escreva uma explicação curta sobre o que é recursão em programação para estudantes do primeiro período. Depois de escrever, avalie a própria resposta segundo este critério: ela está clara e concisa? Em seguida, melhore o texto corrigindo o que estiver confuso e entregue só a versão melhorada.",
+              "novo": " Em seguida, melhore o texto corrigindo o que estiver confuso e entregue só a versão melhorada.",
+              "atende": [
+                true,
+                true,
+                true
+              ],
+              "fala": "O refinamento: a IA aplica a própria crítica e devolve só a versão final.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Escreva uma explicação curta sobre o que é recursão em programação para estudantes do primeiro período. Depois de escrever, avalie a própria resposta segundo este critério: ela está clara e concisa? Em seguida, melhore o texto corrigindo o que estiver confuso e entregue só a versão melhorada.",
+              "novo": "",
+              "atende": [
+                true,
+                true,
+                true
+              ],
+              "fala": "O prompt atende a tudo. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "Escreva uma explicação curta sobre o que é recursão em programação para estudantes do primeiro período. Depois, ___ a própria resposta segundo o critério: ela está ___ e concisa? Em seguida, ___ o texto e entregue só a versão final."
+        }
+      }
+    }
+  },
+  "orac-exame-b": {
+    "conceito": "Ensinar por exemplos (few-shot)",
+    "porque": "Mostrar à IA exemplos de entrada e saída ensina o padrão melhor que descrever com palavras. Com dois ou mais exemplos, ela percebe o formato e o critério e passa a responder do mesmo jeito. Essa técnica se chama few-shot.",
+    "analogia": "É como treinar alguém no trabalho: em vez de explicar a regra em teoria, você mostra dois casos resolvidos. A pessoa entende o padrão e repete nos casos novos.",
+    "ideias": [
+      {
+        "titulo": "Few-shot",
+        "texto": "Dar poucos exemplos para a IA aprender o padrão da resposta."
+      },
+      {
+        "titulo": "Exemplos variados",
+        "texto": "Ao menos dois, de classes diferentes, mostram o contraste."
+      },
+      {
+        "titulo": "Formato fixo",
+        "texto": "Combinar a forma da resposta (Sentimento: ...) facilita ler o resultado."
+      }
+    ],
+    "tituloSintaxe": "O que um bom prompt precisa ter",
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "Tarefa clara",
+            "explica": "Comece dizendo o que fazer: 'Classifique o sentimento de cada frase'."
+          },
+          {
+            "trecho": "Dois exemplos",
+            "explica": "Mostre entrada e saída em pelo menos dois casos diferentes."
+          },
+          {
+            "trecho": "Formato da resposta",
+            "explica": "Diga exatamente como responder, por exemplo 'Sentimento: positivo'."
+          },
+          {
+            "trecho": "Contexto",
+            "explica": "De onde vêm as frases e para que o resultado será usado."
+          }
+        ],
+        "demo": {
+          "tipo": "prompt",
+          "entrada": "o prompt",
+          "codigo": [],
+          "requisitos": [
+            "Dá um papel ou tarefa clara",
+            "Traz pelo menos DOIS exemplos",
+            "Define o formato da resposta",
+            "Tem contexto suficiente"
+          ],
+          "passos": [
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "",
+              "novo": "",
+              "atende": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "fala": "O prompt começa em branco. Em vez de explicar demais, o Criador vai mostrar casos resolvidos."
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Classifique o sentimento de cada frase como positivo, negativo ou neutro.",
+              "novo": "Classifique o sentimento de cada frase como positivo, negativo ou neutro.",
+              "atende": [
+                true,
+                false,
+                false,
+                false
+              ],
+              "fala": "A tarefa e as opções de resposta, bem claras.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Classifique o sentimento de cada frase como positivo, negativo ou neutro. Exemplo 1: 'Adorei o atendimento, voltarei com certeza!' → positivo.",
+              "novo": " Exemplo 1: 'Adorei o atendimento, voltarei com certeza!' → positivo.",
+              "atende": [
+                true,
+                false,
+                false,
+                true
+              ],
+              "fala": "O primeiro exemplo, com a entrada e a resposta esperada.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Classifique o sentimento de cada frase como positivo, negativo ou neutro. Exemplo 1: 'Adorei o atendimento, voltarei com certeza!' → positivo. Exemplo 2: 'A entrega atrasou e o produto veio quebrado.' → negativo.",
+              "novo": " Exemplo 2: 'A entrega atrasou e o produto veio quebrado.' → negativo.",
+              "atende": [
+                true,
+                true,
+                false,
+                true
+              ],
+              "fala": "O segundo exemplo, de outra classe. Com dois, a IA já percebe o padrão.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Classifique o sentimento de cada frase como positivo, negativo ou neutro. Exemplo 1: 'Adorei o atendimento, voltarei com certeza!' → positivo. Exemplo 2: 'A entrega atrasou e o produto veio quebrado.' → negativo. Responda no formato: Sentimento: <positivo|negativo|neutro>, sem explicações adicionais.",
+              "novo": " Responda no formato: Sentimento: <positivo|negativo|neutro>, sem explicações adicionais.",
+              "atende": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "fala": "O formato da resposta fica fixo, fácil de ler e de processar.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Classifique o sentimento de cada frase como positivo, negativo ou neutro. Exemplo 1: 'Adorei o atendimento, voltarei com certeza!' → positivo. Exemplo 2: 'A entrega atrasou e o produto veio quebrado.' → negativo. Responda no formato: Sentimento: <positivo|negativo|neutro>, sem explicações adicionais. Contexto: as frases são avaliações reais de clientes de uma loja online de eletrônicos.",
+              "novo": " Contexto: as frases são avaliações reais de clientes de uma loja online de eletrônicos.",
+              "atende": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "fala": "E o contexto: de onde vêm as frases. Isso ajuda a IA a interpretar gírias e ironias."
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Classifique o sentimento de cada frase como positivo, negativo ou neutro. Exemplo 1: 'Adorei o atendimento, voltarei com certeza!' → positivo. Exemplo 2: 'A entrega atrasou e o produto veio quebrado.' → negativo. Responda no formato: Sentimento: <positivo|negativo|neutro>, sem explicações adicionais. Contexto: as frases são avaliações reais de clientes de uma loja online de eletrônicos.",
+              "novo": "",
+              "atende": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "fala": "O prompt atende a tudo. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "___ o sentimento de cada frase como positivo, negativo ou neutro.\nExemplo 1: 'Adorei o atendimento, voltarei com certeza!' → positivo.\n___: 'A entrega atrasou e o produto veio quebrado.' → negativo.\nResponda no ___: Sentimento: <positivo|negativo|neutro>.\nContexto: as frases são avaliações reais de clientes de uma loja online de eletrônicos."
+        }
+      }
+    }
+  },
+  "orac-sistema": {
+    "conceito": "O prompt de sistema define o comportamento de um assistente",
+    "porque": "O prompt de sistema é a instrução permanente de um assistente: vale para todas as conversas. Ele define quem o assistente é, como fala e as regras do que sempre e nunca fazer. É o lugar certo para as regras que não podem ser esquecidas.",
+    "analogia": "É como o manual de conduta de um funcionário: define a função, o tom de atendimento e os limites, antes de qualquer cliente chegar.",
+    "ideias": [
+      {
+        "titulo": "Identidade",
+        "texto": "Quem o assistente é e qual é a sua função."
+      },
+      {
+        "titulo": "Tom",
+        "texto": "Como ele fala: paciente, objetivo, amigável."
+      },
+      {
+        "titulo": "Regras permanentes",
+        "texto": "O que sempre faz e o que evita, em qualquer conversa."
+      }
+    ],
+    "tituloSintaxe": "O que um bom prompt precisa ter",
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "Identidade",
+            "explica": "Nome, função e ambiente: 'tutor de programação da Masmorra do Código'."
+          },
+          {
+            "trecho": "Tom",
+            "explica": "Descreva a voz do assistente em poucas palavras."
+          },
+          {
+            "trecho": "Sempre",
+            "explica": "Comportamentos fixos: explicar o conceito antes do código, terminar com uma pergunta."
+          },
+          {
+            "trecho": "Nunca",
+            "explica": "Limites que nunca podem ser quebrados: não entregar a solução completa."
+          }
+        ],
+        "demo": {
+          "tipo": "prompt",
+          "entrada": "o prompt",
+          "codigo": [],
+          "requisitos": [
+            "Define o papel/identidade",
+            "Define o tom/estilo",
+            "Define regras do que sempre/nunca fazer",
+            "Tem detalhe suficiente"
+          ],
+          "passos": [
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "",
+              "novo": "",
+              "atende": [
+                false,
+                false,
+                false,
+                false
+              ],
+              "fala": "O prompt começa em branco. Ele vai valer para todas as conversas do assistente."
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Você é um tutor de programação chamado Mentor, da Masmorra do Código.",
+              "novo": "Você é um tutor de programação chamado Mentor, da Masmorra do Código.",
+              "atende": [
+                true,
+                false,
+                false,
+                false
+              ],
+              "fala": "A identidade: nome, função e lugar.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Você é um tutor de programação chamado Mentor, da Masmorra do Código. Fale com tom paciente e objetivo, sem dar sermão.",
+              "novo": " Fale com tom paciente e objetivo, sem dar sermão.",
+              "atende": [
+                true,
+                true,
+                false,
+                false
+              ],
+              "fala": "O tom de voz. Agora o assistente sabe como se comunicar.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Você é um tutor de programação chamado Mentor, da Masmorra do Código. Fale com tom paciente e objetivo, sem dar sermão. Sempre explique o conceito antes de mostrar código e termine cada resposta com uma pergunta para testar o entendimento.",
+              "novo": " Sempre explique o conceito antes de mostrar código e termine cada resposta com uma pergunta para testar o entendimento.",
+              "atende": [
+                true,
+                true,
+                false,
+                true
+              ],
+              "fala": "As regras do que sempre fazer. Elas moldam toda resposta, e o prompt já tem detalhe de sobra.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Você é um tutor de programação chamado Mentor, da Masmorra do Código. Fale com tom paciente e objetivo, sem dar sermão. Sempre explique o conceito antes de mostrar código e termine cada resposta com uma pergunta para testar o entendimento. Evite entregar a solução completa: prefira dar dicas.",
+              "novo": " Evite entregar a solução completa: prefira dar dicas.",
+              "atende": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "fala": "E a regra do que evitar, para o assistente nunca virar um 'copiador de respostas'.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Você é um tutor de programação chamado Mentor, da Masmorra do Código. Fale com tom paciente e objetivo, sem dar sermão. Sempre explique o conceito antes de mostrar código e termine cada resposta com uma pergunta para testar o entendimento. Evite entregar a solução completa: prefira dar dicas.",
+              "novo": "",
+              "atende": [
+                true,
+                true,
+                true,
+                true
+              ],
+              "fala": "O prompt atende a tudo. O monstro caiu.",
+              "fim": true
+            }
+          ]
+        },
+        "guiado": {
+          "starter": "Você é um tutor de programação chamado Mentor, da Masmorra do Código. Fale com ___ paciente e objetivo, sem dar sermão. Sempre explique o conceito antes de mostrar código e termine cada resposta com uma pergunta para testar o entendimento. ___ entregar a solução completa: prefira dar dicas."
+        }
+      }
+    }
+  },
+  "orac-exame-a": {
+    "conceito": "O prompt mestre: tudo junto",
+    "porque": "Aqui você reúne todas as técnicas num único prompt: papel, contexto rico, restrições, formato estruturado, um exemplo e raciocínio passo a passo. Cada parte resolve um problema diferente, e juntas elas dão o resultado mais confiável.",
+    "analogia": "É como um projeto bem briefado: o especialista certo, o contexto completo, os limites combinados, a forma de entrega, uma referência e a ordem de trabalho. Nada fica para a sorte.",
+    "ideias": [
+      {
+        "titulo": "Camadas que se somam",
+        "texto": "Cada técnica cobre uma falha: papel foca, contexto situa, restrição limita, formato organiza."
+      },
+      {
+        "titulo": "Contexto rico",
+        "texto": "Quanto mais a IA sabe sobre a pessoa e o objetivo, mais personalizado o resultado."
+      },
+      {
+        "titulo": "Raciocinar antes de montar",
+        "texto": "Pedir a análise antes da resposta melhora a qualidade do plano."
+      }
+    ],
+    "tituloSintaxe": "O que um bom prompt precisa ter",
+    "linguagens": {
+      "js": {
+        "sintaxe": [
+          {
+            "trecho": "Papel",
+            "explica": "Um mentor de carreira com experiência relevante."
+          },
+          {
+            "trecho": "Contexto rico",
+            "explica": "Perfil da pessoa, tempo disponível e objetivo concreto."
+          },
+          {
+            "trecho": "Restrições",
+            "explica": "Tipo de material, idioma e limite de tópicos por semana."
+          },
+          {
+            "trecho": "Formato estruturado",
+            "explica": "Uma tabela com colunas definidas."
+          },
+          {
+            "trecho": "Exemplo",
+            "explica": "Uma linha de amostra da tabela."
+          },
+          {
+            "trecho": "Passo a passo",
+            "explica": "Peça para analisar antes de responder."
+          }
+        ],
+        "demo": {
+          "tipo": "prompt",
+          "entrada": "o prompt",
+          "codigo": [],
+          "requisitos": [
+            "Dá um papel/persona à IA",
+            "Dá contexto rico",
+            "Define restrições",
+            "Exige formato estruturado",
+            "Inclui um exemplo",
+            "Pede raciocínio passo a passo"
+          ],
+          "passos": [
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "",
+              "novo": "",
+              "atende": [
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+              ],
+              "fala": "O prompt começa em branco. Aqui entram as seis técnicas juntas."
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Aja como um mentor de carreira em programação com 15 anos de experiência.",
+              "novo": "Aja como um mentor de carreira em programação com 15 anos de experiência.",
+              "atende": [
+                true,
+                false,
+                false,
+                false,
+                false,
+                false
+              ],
+              "fala": "O papel: um mentor experiente.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Aja como um mentor de carreira em programação com 15 anos de experiência. Monte um plano de estudos de 8 semanas para uma estudante do 4º período de Engenharia de Software que domina lógica e JavaScript básico, estuda 10 horas por semana e quer chegar ao primeiro estágio em desenvolvimento web.",
+              "novo": " Monte um plano de estudos de 8 semanas para uma estudante do 4º período de Engenharia de Software que domina lógica e JavaScript básico, estuda 10 horas por semana e quer chegar ao primeiro estágio em desenvolvimento web.",
+              "atende": [
+                true,
+                true,
+                false,
+                false,
+                false,
+                false
+              ],
+              "fala": "O contexto rico: perfil, tempo disponível e objetivo. Com isso o plano deixa de ser genérico.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Aja como um mentor de carreira em programação com 15 anos de experiência. Monte um plano de estudos de 8 semanas para uma estudante do 4º período de Engenharia de Software que domina lógica e JavaScript básico, estuda 10 horas por semana e quer chegar ao primeiro estágio em desenvolvimento web. Restrições: use apenas materiais gratuitos e em português, e não inclua mais de 3 tópicos por semana.",
+              "novo": " Restrições: use apenas materiais gratuitos e em português, e não inclua mais de 3 tópicos por semana.",
+              "atende": [
+                true,
+                true,
+                true,
+                false,
+                false,
+                false
+              ],
+              "fala": "As restrições mantêm o plano realista e acessível.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Aja como um mentor de carreira em programação com 15 anos de experiência. Monte um plano de estudos de 8 semanas para uma estudante do 4º período de Engenharia de Software que domina lógica e JavaScript básico, estuda 10 horas por semana e quer chegar ao primeiro estágio em desenvolvimento web. Restrições: use apenas materiais gratuitos e em português, e não inclua mais de 3 tópicos por semana. Entregue em formato de tabela, com as colunas semana, tópicos, prática e entrega.",
+              "novo": " Entregue em formato de tabela, com as colunas semana, tópicos, prática e entrega.",
+              "atende": [
+                true,
+                true,
+                true,
+                true,
+                false,
+                false
+              ],
+              "fala": "O formato estruturado: uma tabela com colunas definidas.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Aja como um mentor de carreira em programação com 15 anos de experiência. Monte um plano de estudos de 8 semanas para uma estudante do 4º período de Engenharia de Software que domina lógica e JavaScript básico, estuda 10 horas por semana e quer chegar ao primeiro estágio em desenvolvimento web. Restrições: use apenas materiais gratuitos e em português, e não inclua mais de 3 tópicos por semana. Entregue em formato de tabela, com as colunas semana, tópicos, prática e entrega. Exemplo de linha: Semana 1 | HTML e CSS | Montar uma página pessoal | Link do repositório.",
+              "novo": " Exemplo de linha: Semana 1 | HTML e CSS | Montar uma página pessoal | Link do repositório.",
+              "atende": [
+                true,
+                true,
+                true,
+                true,
+                true,
+                false
+              ],
+              "fala": "O exemplo de uma linha fixa o nível de detalhe esperado.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Aja como um mentor de carreira em programação com 15 anos de experiência. Monte um plano de estudos de 8 semanas para uma estudante do 4º período de Engenharia de Software que domina lógica e JavaScript básico, estuda 10 horas por semana e quer chegar ao primeiro estágio em desenvolvimento web. Restrições: use apenas materiais gratuitos e em português, e não inclua mais de 3 tópicos por semana. Entregue em formato de tabela, com as colunas semana, tópicos, prática e entrega. Exemplo de linha: Semana 1 | HTML e CSS | Montar uma página pessoal | Link do repositório. Antes de responder, pense passo a passo: avalie o nível da estudante, priorize o essencial e só então monte a tabela.",
+              "novo": " Antes de responder, pense passo a passo: avalie o nível da estudante, priorize o essencial e só então monte a tabela.",
+              "atende": [
+                true,
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              "fala": "E o raciocínio por etapas, para a IA analisar antes de montar. Estão todas as seis camadas.",
+              "dano": true
+            },
+            {
+              "linha": -1,
+              "vars": [],
+              "texto": "Aja como um mentor de carreira em programação com 15 anos de experiência. Monte um plano de estudos de 8 semanas para uma estudante do 4º período de Engenharia de Software que domina lógica e JavaScript básico, estuda 10 horas por semana e quer chegar ao primeiro estágio em desenvolvimento web. Restrições: use apenas materiais gratuitos e em português, e não inclua mais de 3 tópicos por semana. Entregue em formato de tabela, com as colunas semana, tópicos, prática e entrega. Exemplo de linha: Semana 1 | HTML e CSS | Montar uma página pessoal | Link do repositório. Antes de responder, pense passo a passo: avalie o nível da estudante, priorize o essencial e só então monte a tabela.",
+              "novo": "",
+              "atende": [
+                true,
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              "fala": "O prompt atende a tudo. O monstro caiu.",
+              "fim": true
+            }
+          ],
+          "ritmo": 2600
+        },
+        "guiado": {
+          "starter": "___ como um mentor de carreira em programação com 15 anos de experiência.\nMonte um plano de estudos de 8 semanas para uma estudante do 4º período de Engenharia de Software que domina lógica e JavaScript básico, estuda 10 horas por semana e quer chegar ao primeiro estágio em desenvolvimento web.\nRestrições: use ___ materiais gratuitos e em português, e não inclua mais de 3 tópicos por semana.\nEntregue em formato de ___, com as colunas semana, tópicos, prática e entrega.\n___ de linha: Semana 1 | HTML e CSS | Montar uma página pessoal | Link do repositório.\nAntes de responder, pense ___: avalie o nível da estudante, priorize o essencial e só então monte a tabela."
         }
       }
     }
