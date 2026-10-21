@@ -1857,8 +1857,10 @@ body.sem-cursor {
   animation: fadeIn 0.2s ease;
 }
 .batalha-canvas {
-  width: min(100vw, 960px);
-  max-height: 100vh;
+  /* o cenário cobre a tela inteira, em qualquer proporção (corta um pouco as bordas em vez de deixar faixas pretas) */
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
   image-rendering: pixelated;
   display: block;
 }
@@ -3136,7 +3138,7 @@ body.sem-cursor {
 @keyframes servo-pulo { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
 @media (prefers-reduced-motion: reduce) { .servo-pulo { animation: none; } }
 
-.aula { min-height: 100vh; background: #06070d; color: #e8ecf7; display: flex; flex-direction: column; }
+.aula-pagina { min-height: 100vh; background: #06070d; color: #e8ecf7; display: flex; flex-direction: column; } /* não pode se chamar só .aula: o link "Assistir aula" do combate já usa essa classe */
 .aula-etapas {
   list-style: none; margin: 0; padding: 12px 20px; display: flex; gap: 22px; justify-content: center;
   border-bottom: 1px solid #141e34; font-family: "Courier New", monospace; font-size: 12px; letter-spacing: 0.08em; color: #4a5876;
@@ -3242,3 +3244,7 @@ body.sem-cursor {
 .ex-veio-titulo, .aula-tela-titulo { font-family: "Courier New", monospace; font-size: 10px; letter-spacing: 0.14em; color: #5f7390; margin-bottom: 6px; }
 .aula-tela { padding: 10px 12px; background: #0e1426; border: 1px solid #1c2842; border-radius: 10px; }
 .aula-tela pre { margin: 0; min-height: 28px; }
+
+/* o editor começa pequeno e cresce conforme o código (EditorAuto) */
+.ex-monaco.auto { flex: none; min-height: 0; }
+.editor-auto { transition: height 0.12s ease; }

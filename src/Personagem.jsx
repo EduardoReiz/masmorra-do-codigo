@@ -33,7 +33,7 @@ export default function Personagem({ progresso, classe, cfg, equip, aura = "nenh
     canvas.width = W * P;
     canvas.height = H * P;
     ctx.imageSmoothingEnabled = false;
-    const { pal, crista } = paletasEquip(eq);
+    const { pal, crista, ids } = paletasEquip(eq);
     const ciclo = 3.6, dur = 1.1, off = Math.random() * ciclo;
     let parts = [], ultimaFase = -1, raf;
     const corAcao = pal.arma ? pal.arma[2] : null;
@@ -62,7 +62,7 @@ export default function Personagem({ progresso, classe, cfg, equip, aura = "nenh
       const ph = agindo ? (fase - (ciclo - dur)) / dur : -1;
       const dy = Math.sin(t * 3.2) > 0.35 ? 1 : 0;
       const piscar = t % 3.7 < 0.13;
-      const { grid, ponta, arma } = montarSprite({ cfg: conf, classe: cls, dy, piscar, pal, crista, acao: agindo, ph });
+      const { grid, ponta, arma } = montarSprite({ cfg: conf, classe: cls, dy, piscar, pal, ids, crista, acao: agindo, ph });
       if (agindo) particulas(arma, ph, ponta);
       ultimaFase = agindo ? ph : -1;
 

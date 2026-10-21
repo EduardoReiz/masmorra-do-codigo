@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import Editor from "@monaco-editor/react";
+import EditorAuto from "./EditorAuto";
 import "./App.css";
 import BotaoVoltar from "./BotaoVoltar";
 import { RANKS } from "./dados/exercicios";
@@ -285,7 +285,7 @@ export default function Exercicio({ exercicio, fraturado, classe, criador, lingu
 
         <section className="ex-editor">
           <div className="ex-editor-top" translate="no">{ehPrompt ? "SEU PROMPT" : lang.nome}</div>
-          <div className="ex-monaco">
+          <div className={"ex-monaco" + (ehPrompt ? "" : " auto")}>
             {ehPrompt ? (
               <textarea
                 className="ex-prompt"
@@ -297,14 +297,13 @@ export default function Exercicio({ exercicio, fraturado, classe, criador, lingu
                 spellCheck={false}
               />
             ) : (
-              <Editor
-                height="100%"
+              <EditorAuto
+                min={160}
+                max={560}
                 language={lang.monaco}
-                theme="vs-dark"
                 value={codigo}
                 onChange={(v) => setCodigo(v ?? "")}
                 onMount={aoMontarEditor}
-                options={{ fontSize: 14, minimap: { enabled: false }, scrollBeyondLastLine: false, padding: { top: 12 } }}
               />
             )}
           </div>

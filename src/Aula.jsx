@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
-import Editor from "@monaco-editor/react";
+import EditorAuto from "./EditorAuto";
 import "./App.css";
 import BotaoVoltar from "./BotaoVoltar";
 import Servo from "./Servo";
@@ -26,7 +26,7 @@ export default function Aula({ exercicio, linguagem, onConcluir, onSair }) {
   }
 
   return (
-    <div className="aula" data-etapa={etapa}>
+    <div className="aula-pagina" data-etapa={etapa}>
       <header className="ex-top">
         <BotaoVoltar onClick={onSair} />
         <div className="ex-tag" translate="no">AULA · {exercicio.titulo.toUpperCase()} · {linguagem.nome.toUpperCase()}</div>
@@ -265,13 +265,12 @@ function Guiado({ aula, exercicio, linguagem, onFala, onVoltar, onConcluir }) {
       </p>
 
       <div className="aula-editor">
-        <Editor
-          height="260px"
+        <EditorAuto
+          min={120}
+          max={420}
           language={linguagem.monaco}
-          theme="vs-dark"
           value={codigo}
           onChange={(v) => setCodigo(v ?? "")}
-          options={{ fontSize: 14, minimap: { enabled: false }, scrollBeyondLastLine: false, padding: { top: 12 } }}
         />
       </div>
 

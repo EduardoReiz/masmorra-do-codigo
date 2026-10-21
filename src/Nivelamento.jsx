@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Editor from "@monaco-editor/react";
+import EditorAuto from "./EditorAuto";
 import "./App.css";
 import BotaoVoltar from "./BotaoVoltar";
 import { NIVELAMENTO } from "./dados/nivelamento";
@@ -98,14 +98,13 @@ export default function Nivelamento({ linguagem, onConcluir, onSair }) {
 
         <section className="ex-editor">
           <div className="ex-editor-top" translate="no">{lang.nome}</div>
-          <div className="ex-monaco">
-            <Editor
-              height="100%"
+          <div className="ex-monaco auto">
+            <EditorAuto
+              min={160}
+              max={520}
               language={lang.monaco}
-              theme="vs-dark"
               value={codigo}
               onChange={(v) => setCodigo(v ?? "")}
-              options={{ fontSize: 14, minimap: { enabled: false }, scrollBeyondLastLine: false, padding: { top: 12 } }}
             />
           </div>
           <div className="ex-acoes niv-acoes">

@@ -183,7 +183,7 @@ export default function Batalha({ resultado, corHeroi, seedHeroi, heroi: heroiCf
         ctx.globalAlpha = 1;
       } else if (sprite) {
         const dy = Math.floor(t / 14) % 2;
-        const { grid } = montarSprite({ cfg: sprite.cfg, classe: sprite.classe, dy, piscar: false, pal: sprite.pal, crista: sprite.crista, acao: acting, ph });
+        const { grid } = montarSprite({ cfg: sprite.cfg, classe: sprite.classe, dy, piscar: false, pal: sprite.pal, ids: sprite.ids, crista: sprite.crista, acao: acting, ph });
         ctx.globalAlpha = alpha;
         ctx.fillStyle = "rgba(0,0,0,0.35)";
         ctx.fillRect(Math.round(heroX) + 18, GROUND, 24, 2);
