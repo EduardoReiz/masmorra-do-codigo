@@ -9,7 +9,7 @@ import { executar, executarPrograma, chamada, avaliarPrompt } from "./executa";
 import { starterDe } from "./dados/linguagens";
 import Batalha from "./Batalha";
 import ItemIcon from "./ItemIcon";
-import { sortearDrop, item as itemEquip, RARIDADES } from "./dados/equipamento";
+import { sortearDrop, item as itemEquip, RARIDADES, buffDe, buffsTotais } from "./dados/equipamento";
 import { instanciar } from "./dados/gerador";
 import Prova from "./Prova";
 import { PROVAS } from "./dados/provas";
@@ -107,7 +107,7 @@ export default function Exercicio({ exercicio, fraturado, classe, criador, lingu
       if (saiuRef.current > 0) f.push(`saiu da aba ${saiuRef.current}x`);
       if (!ex.semLimiteDeTempo && Date.now() - inicioRef.current < LIMITE_RAPIDO_MS) f.push("resolveu rápido demais");
       setFlags(f);
-      setDrop(sortearDrop(classe, { chefe: ex.chefe, fraturado }));
+      setDrop(sortearDrop(classe, { chefe: ex.chefe, fraturado, buffs: buffsTotais(heroi?.equip) }));
       setBatalha("vitoria");
     } else {
       setBatalha("derrota");
@@ -378,6 +378,7 @@ export default function Exercicio({ exercicio, fraturado, classe, criador, lingu
                   <span className="ex-drop-label">ITEM DROPADO</span>
                   <span className="ex-drop-nome">{itemEquip(drop).nome}</span>
                   <span className="ex-drop-rar" translate="no">{RARIDADES[itemEquip(drop).raridade].nome}</span>
+                  {buffDe(itemEquip(drop)) && <span className="ex-drop-rar">{buffDe(itemEquip(drop)).rotulo}</span>}
                 </div>
               </div>
             )}

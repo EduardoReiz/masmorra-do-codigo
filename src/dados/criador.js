@@ -9,6 +9,16 @@ export function ehCriador(progresso) {
   return !!email && email.trim().toLowerCase() === EMAIL_CRIADOR;
 }
 
+// Qual arte do Criador aparece: com alguma peça exclusiva vestida ele usa a armadura
+// escolhida (1 a 3); sem armadura, usa a roupa escolhida (1 a 3). Arte que ainda não
+// existe cai na arte principal (criador-heroi).
+export const OPCOES_CRIADOR = [1, 2, 3];
+export function quadroDoCriador(progresso) {
+  const eq = progresso?.equip || {};
+  const armado = ["capacete", "colete", "calca", "sapato"].some((s) => typeof eq[s] === "string" && eq[s].startsWith("cri-"));
+  return armado ? `criador-armadura-${progresso?.criadorArmadura || 1}` : `criador-roupa-${progresso?.criadorRoupa || 1}`;
+}
+
 // avatar exclusivo do Criador (aplicado por padrão quando ele entra)
 export const AVATAR_CRIADOR = {
   cor: "cor-obsidiana",

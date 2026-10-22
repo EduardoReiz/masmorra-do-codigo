@@ -102,12 +102,51 @@ function escolhePeso(pesos) {
 // Sorteia um drop ao vencer. Variância de raridade: comum é o mais provável;
 // fratura e chefe empurram para cima. Itens de "evento" NÃO caem aqui (só em
 // eventos do servidor). Pode devolver null (sem drop).
-export function sortearDrop(classe, { chefe, fraturado } = {}) {
-  const baseDrop = chefe || fraturado ? 1 : 0.45;
-  if (Math.random() > baseDrop) return null;
+// Chance de cair item e peso de cada raridade, por tipo de vitória, já com os bônus do equipamento.
+export function chancesDrop({ chefe, fraturado, buffs } = {}) {
+  const b = buffs || { xp: 0, drop: 0, sorte: 0 };
+  const chance = chefe || fraturado ? 1 : Math.min(1, 0.45 + b.drop / 100);
   let pesos = { comum: 56, raro: 28, epico: 12, lendario: 4 };
   if (fraturado) pesos = { comum: 20, raro: 38, epico: 30, lendario: 12 };
   if (chefe) pesos = { comum: 10, raro: 30, epico: 40, lendario: 20 };
+  const k = 1 + b.sorte / 100; // a sorte empurra o peso para o raro, o épico e o lendário
+  pesos = { comum: pesos.comum, raro: pesos.raro * k, epico: pesos.epico * k, lendario: pesos.lendario * k };
+  const soma = Object.values(pesos).reduce((a, c) => a + c, 0);
+  const pct = Object.fromEntries(Object.entries(pesos).map(([r, v]) => [r, (v / soma) * 100]));
+  return { chance, pesos, pct };
+}
+
+// Do raro para cima, cada peça equipada dá um bônus conforme o espaço. Itens do Criador não têm bônus.
+const BUFF_SLOT = { capacete: "xp", colete: "drop", calca: "sorte", sapato: "xp", arma: "xp" };
+const BUFF_VALOR = {
+  raro: { xp: 3, drop: 5, sorte: 10 },
+  epico: { xp: 6, drop: 10, sorte: 20 },
+  lendario: { xp: 10, drop: 15, sorte: 30 },
+  evento: { xp: 10, drop: 15, sorte: 30 },
+};
+const BUFF_ROTULO = {
+  xp: (v) => `+${v}% de XP`,
+  drop: (v) => `+${v} pontos na chance de drop`,
+  sorte: (v) => `+${v}% de chance de item raro ou melhor`,
+};
+export function buffDe(it) {
+  const valores = it && BUFF_VALOR[it.raridade];
+  if (!valores || it.exclusivo) return null;
+  const tipo = BUFF_SLOT[it.slot];
+  return { tipo, valor: valores[tipo], rotulo: BUFF_ROTULO[tipo](valores[tipo]) };
+}
+export function buffsTotais(equip) {
+  const t = { xp: 0, drop: 0, sorte: 0 };
+  for (const id of Object.values(equip || {})) {
+    const b = id && buffDe(item(id));
+    if (b) t[b.tipo] += b.valor;
+  }
+  return t;
+}
+
+export function sortearDrop(classe, { chefe, fraturado, buffs } = {}) {
+  const { chance, pesos } = chancesDrop({ chefe, fraturado, buffs });
+  if (Math.random() > chance) return null;
   const raridade = escolhePeso(pesos);
   const tipoArma = ARMA_POR_CLASSE[classe];
   const pool = ITENS.filter(

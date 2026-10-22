@@ -76,6 +76,12 @@ export default function Batalha({ resultado, corHeroi, seedHeroi, heroi: heroiCf
     // o Criador luta com a arte própria (quadros do jogo em public/criador)
     const QUADROS_CRIADOR = ["criador-heroi", "criador-heroi-idle2", "criador-heroi-ataque", "criador-heroi-magia", "criador-heroi-vitoria"];
     const quadroCri = {};
+    let estatico = null; // roupa ou armadura escolhida (quando a arte existe): vale para todas as poses
+    if (criador && heroiCfg?.criadorQuadro && heroiCfg.criadorQuadro !== "criador-armadura-1") {
+      const im0 = new Image();
+      im0.onload = () => { estatico = im0; };
+      im0.src = `/criador/${heroiCfg.criadorQuadro}.png`;
+    }
     if (criador) {
       for (const n of QUADROS_CRIADOR) {
         const im = new Image();
@@ -174,7 +180,7 @@ export default function Batalha({ resultado, corHeroi, seedHeroi, heroi: heroiCf
     function drawHeroi(heroX, heroY, alpha, acting, ph, pose) {
       if (alpha <= 0) return;
       const poseAtual = pose || (criador && acting ? "criador-heroi-ataque" : null);
-      const qc = criador && (quadroCri[poseAtual] || quadroCri[Math.floor(t / 14) % 2 ? "criador-heroi-idle2" : "criador-heroi"]);
+      const qc = criador && (estatico || quadroCri[poseAtual] || quadroCri[Math.floor(t / 14) % 2 ? "criador-heroi-idle2" : "criador-heroi"]);
       if (qc) {
         const h = 80, w = Math.round((qc.width / qc.height) * h);
         ctx.globalAlpha = alpha;

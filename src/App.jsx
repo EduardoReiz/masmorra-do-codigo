@@ -16,7 +16,8 @@ import { aulaDe } from "./dados/aulas";
 import { linguagemDoJogador } from "./dados/linguagens";
 import { trackDe, rankDe, idsParaComecarEm } from "./dados/exercicios";
 import { AVATAR_PADRAO, equipado, cosmetico, semente } from "./dados/cosmeticos";
-import { ehCriador, AVATAR_CRIADOR } from "./dados/criador";
+import { ehCriador, AVATAR_CRIADOR, quadroDoCriador } from "./dados/criador";
+import { buffsTotais } from "./dados/equipamento";
 import { monarcaDe } from "./dados/monarcas";
 import { configPersonagem } from "./dados/personagem";
 import { registrarDia, bonusXp } from "./streak";
@@ -168,7 +169,7 @@ function App() {
   // Calcula o progresso após uma vitória limpa (sem mexer no estado ainda).
   function aposVitoria(base, ex, dropId) {
     if (base.derrotados.includes(ex.id)) return { p: base, subiu: null };
-    const ganho = Math.round(ex.xp * (fraturado ? 2 : 1) * (1 + bonusXp(base.sequencia || 0)));
+    const ganho = Math.round(ex.xp * (fraturado ? 2 : 1) * (1 + bonusXp(base.sequencia || 0)) * (1 + buffsTotais(base.equip).xp / 100));
     const derrotados = [...base.derrotados, ex.id];
     const itens =
       fraturado && !base.itens.includes("fragmento-portal")
@@ -296,6 +297,7 @@ function App() {
         progresso={progresso}
         onEquipar={equiparItem}
         onAbrirAvatar={() => setTela("avatar")}
+        onAparencia={(chave, valor) => atualizar({ ...progresso, [chave]: valor })}
         onVoltar={() => setTela("dashboard")}
       />
     );
@@ -343,7 +345,7 @@ function App() {
         linguagem={linguagemDoJogador(progresso)}
         heroiCor={cosmetico(eq.cor).valor}
         heroiSeed={semente(progresso.classe || "Caçador")}
-        heroi={{ cfg: configPersonagem(progresso), classe: progresso.classe || "O Arquiteto", equip: progresso.equip || {} }}
+        heroi={{ cfg: configPersonagem(progresso), classe: progresso.classe || "O Arquiteto", equip: progresso.equip || {}, criadorQuadro: ehCriador(progresso) ? quadroDoCriador(progresso) : null }}
         onSair={() => { setTela(comoJogador ? "dominio" : "dashboard"); setComoJogador(false); }}
         onVencer={(suspeito, dropId) => {
           if (comoJogador) { setComoJogador(false); setTela("dominio"); return; } // teste não mexe no progresso

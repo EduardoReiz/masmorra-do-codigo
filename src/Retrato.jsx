@@ -1,7 +1,7 @@
 import "./App.css";
 import Personagem from "./Personagem";
 import CriadorPixel from "./CriadorPixel";
-import { ehCriador } from "./dados/criador";
+import { ehCriador, quadroDoCriador } from "./dados/criador";
 import { RankEmblema } from "./Emblema";
 import { equipado, cosmetico } from "./dados/cosmeticos";
 
@@ -14,7 +14,7 @@ export default function Retrato({ progresso, tamanho = 192, rank, animado = true
   return (
     <div className={`quadro mold-${moldura}` + (compacto ? " compacto" : "")}>
       {ehCriador(progresso)
-        ? <CriadorPixel tamanho={Math.round(tamanho * 0.92)} linhas={tamanho > 120 ? 96 : 56} className="retrato-criador" />
+        ? <CriadorPixel quadro={quadroDoCriador(progresso)} tamanho={Math.round(tamanho * 0.92)} linhas={tamanho > 120 ? 96 : 56} className="retrato-criador" />
         : <Personagem progresso={progresso} tamanho={tamanho} aura={aura} animado={animado} acoes={acoes} />}
       <RankEmblema rank={rank} tamanho={compacto ? 24 : 44} className="quadro-rank" />
     </div>

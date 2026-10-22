@@ -24,6 +24,7 @@ export default function CriadorPixel({ tamanho = 72, quadro = "criador-heroi", l
       ctx.putImageData(d, 0, 0);
       c.style.width = Math.round((w / h) * tamanho) + "px";
     };
+    im.onerror = () => { if (vivo && im.dataset.fallback !== "1") { im.dataset.fallback = "1"; im.src = "/criador/criador-heroi.png"; } };
     im.src = `/criador/${quadro}.png`;
     return () => { vivo = false; };
   }, [quadro, linhas, tamanho]);
