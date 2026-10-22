@@ -58,7 +58,7 @@ export default function Batalha({ resultado, corHeroi, seedHeroi, heroi: heroiCf
     const sprite = heroiCfg ? { ...heroiCfg, ...paletasEquip(heroiCfg.equip) } : null;
     const tipoArma = sprite ? (ROUPA_CLASSE[sprite.classe] || ROUPA_CLASSE["O Arquiteto"]).arma : "espada";
     const corpoACorpo = tipoArma === "espada";
-    const SC = 3;
+    const SC = 2; // o sprite é 40x48: cada pixel dele ocupa 2 da cena (80x96)
     const MCELL = 11;
     const monMat = matriz(semente(monstro.nome), 9, 7, 0.4);
 
@@ -186,9 +186,9 @@ export default function Batalha({ resultado, corHeroi, seedHeroi, heroi: heroiCf
         const { grid } = montarSprite({ cfg: sprite.cfg, classe: sprite.classe, dy, piscar: false, pal: sprite.pal, ids: sprite.ids, crista: sprite.crista, acao: acting, ph });
         ctx.globalAlpha = alpha;
         ctx.fillStyle = "rgba(0,0,0,0.35)";
-        ctx.fillRect(Math.round(heroX) + 18, GROUND, 24, 2);
-        for (let y = 0; y < 24; y++) for (let x = 0; x < 20; x++) {
-          const c = grid[y * 20 + x];
+        ctx.fillRect(Math.round(heroX) + 22, GROUND, 36, 2);
+        for (let y = 0; y < 48; y++) for (let x = 0; x < 40; x++) {
+          const c = grid[y * 40 + x];
           if (c) { ctx.fillStyle = c; ctx.fillRect(Math.round(heroX) + x * SC, Math.round(heroY) + y * SC, SC, SC); }
         }
         ctx.globalAlpha = 1;
@@ -199,7 +199,7 @@ export default function Batalha({ resultado, corHeroi, seedHeroi, heroi: heroiCf
 
     function draw() {
       const p = t / DUR;
-      const heroYbase = sprite ? 84 : 90;
+      const heroYbase = sprite ? 56 : 90;
       const bobH = Math.sin(t * 0.22) * 1.2;
       const bobM = Math.sin(t * 0.22 + 1.2) * 1.4;
 
@@ -233,7 +233,7 @@ export default function Batalha({ resultado, corHeroi, seedHeroi, heroi: heroiCf
         const b = (p - 0.30) / 0.22;
         acting = true;
         ph = clamp(b / 0.8, 0, 1);
-        if (corpoACorpo) heroX = 70 + bump(b) * 80;
+        if (corpoACorpo) heroX = 70 + bump(b) * 60;
         if (vitoria) {
           if (b >= 0.5) {
             const kk = clamp((b - 0.5) / 0.5, 0, 1);
@@ -291,7 +291,7 @@ export default function Batalha({ resultado, corHeroi, seedHeroi, heroi: heroiCf
       // projétil dos ataques à distância (durante o ataque do herói)
       if (sprite && !corpoACorpo && p >= 0.33 && p < 0.47 && (vitoria || p < 0.42)) {
         const k = (p - 0.33) / 0.14;
-        const px0 = heroX + 57, py0 = 126, px1 = monCx - 10, py1 = 118;
+        const px0 = heroX + 74, py0 = 118, px1 = monCx - 10, py1 = 118;
         const xx = px0 + (px1 - px0) * k, yy = py0 + (py1 - py0) * k;
         if (tipoArma === "arco") {
           ctx.fillStyle = "#c8b090"; ctx.fillRect(Math.round(xx) - 10, Math.round(yy), 10, 2);
