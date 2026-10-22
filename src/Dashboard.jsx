@@ -185,6 +185,11 @@ export default function Dashboard({ progresso, subiuPara, onFecharRankUp, onVolt
               </div>
             </div>
           </div>
+          {(progresso.maldicao || 0) > 0 && (
+            <div className="maldicao-faixa" translate="no">
+              <span aria-hidden="true">☠</span> Maldição ativa: −20% de XP nos próximos {progresso.maldicao} {progresso.maldicao === 1 ? "monstro" : "monstros"}
+            </div>
+          )}
         </section>
 
         {atual ? (

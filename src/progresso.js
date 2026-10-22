@@ -10,6 +10,8 @@ function arr(x) {
   return Array.isArray(x) ? x : [];
 }
 
+export const carregarPadrao = () => ({ ...PADRAO });
+
 export function carregar() {
   try {
     const raw = localStorage.getItem(CHAVE);
@@ -35,6 +37,39 @@ export function salvar(p) {
   } catch {
     // modo anônimo ou storage bloqueado: segue sem persistir
   }
+}
+
+// Cada conta tem o próprio progresso. A conta ativa fica na chave principal (CHAVE); ao trocar de
+// conta, o progresso de quem sai é guardado numa chave só dela, e o de quem entra é recuperado.
+// (Ainda é local, só neste navegador: contas de verdade dependem do servidor.)
+export function idDaConta(conta) {
+  if (!conta) return null;
+  return (conta.email || `${conta.metodo || "local"}:${conta.nome || ""}`).trim().toLowerCase();
+}
+const chaveDaConta = (id) => `masmorra.conta.v1.${id}`;
+
+export function guardarDaConta(p) {
+  const id = idDaConta(p?.conta);
+  if (!id) return;
+  try {
+    localStorage.setItem(chaveDaConta(id), JSON.stringify(p));
+  } catch {
+    // storage bloqueado
+  }
+}
+
+export function progressoDaConta(conta) {
+  const id = idDaConta(conta);
+  try {
+    const raw = id && localStorage.getItem(chaveDaConta(id));
+    if (raw) {
+      const p = JSON.parse(raw);
+      return { ...PADRAO, ...p, conta, derrotados: arr(p.derrotados), itens: arr(p.itens), suspeitos: arr(p.suspeitos), itensEquip: arr(p.itensEquip), equip: p.equip && typeof p.equip === "object" ? p.equip : {} };
+    }
+  } catch {
+    // cai no progresso novo
+  }
+  return { ...PADRAO, conta };
 }
 
 export function limpar() {

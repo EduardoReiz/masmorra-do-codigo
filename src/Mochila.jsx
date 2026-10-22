@@ -39,7 +39,7 @@ function Slot({ s, equip, filtro, setFiltro }) {
   );
 }
 
-export default function Mochila({ progresso, onEquipar, onAbrirAvatar, onAparencia, onVoltar }) {
+export default function Mochila({ progresso, onEquipar, onAbrirAvatar, onAparencia, onQuebrarMaldicao, onVoltar }) {
   const [filtro, setFiltro] = useState(null);
   const [estreito] = useState(() => window.innerWidth < 520); // celular: retrato menor
   const equip = progresso.equip || {};
@@ -127,6 +127,12 @@ export default function Mochila({ progresso, onEquipar, onAbrirAvatar, onAparenc
               ? "Nenhum bônus ativo. Itens raros, épicos e lendários vestidos dão bônus."
               : [bonus.xp && `+${bonus.xp}% de XP`, bonus.drop && `+${bonus.drop} pontos na chance de drop`, bonus.sorte && `+${bonus.sorte}% de chance de item raro ou melhor`].filter(Boolean).join(" · ")}
           </p>
+          {(progresso.maldicao || 0) > 0 && (
+            <div className="maldicao-faixa" translate="no">
+              <span aria-hidden="true">☠</span> Maldição ativa: −20% de XP nos próximos {progresso.maldicao} {progresso.maldicao === 1 ? "monstro" : "monstros"}.
+              {fragmentos > 0 && <button type="button" className="visual-op" onClick={onQuebrarMaldicao}>Quebrar com um Fragmento de Portal</button>}
+            </div>
+          )}
           <div className="chances-tabela" role="table" translate="no">
             <div className="chances-lin cab" role="row"><span>Vitória</span><span>Cai item</span>{["comum", "raro", "epico", "lendario"].map((r) => <span key={r} style={{ color: RARIDADES[r].cor }}>{RARIDADES[r].nome}</span>)}</div>
             {[["Monstro", {}], ["Portal fraturado", { fraturado: true }], ["Exame (chefe)", { chefe: true }]].map(([nome, ctx]) => {

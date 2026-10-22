@@ -33,7 +33,7 @@ function nivelAcima(nivel) {
 
 const LIMITE_RAPIDO_MS = 10000; // terminar antes disso = "rápido demais"
 
-export default function Exercicio({ exercicio, fraturado, classe, criador, linguagem, heroiCor, heroiSeed, heroi, onSair, onVencer }) {
+export default function Exercicio({ exercicio, fraturado, classe, criador, linguagem, heroiCor, heroiSeed, heroi, onSair, onVencer, onDerrota }) {
   // moldes geram uma variação nova (prática infinita, sempre correta). O botão
   // "sortear outra" troca a semente. Exercício estático passa direto.
   const [seed, setSeed] = useState(() => (Date.now() ^ ((Math.random() * 1e9) | 0)) >>> 0);
@@ -124,7 +124,7 @@ export default function Exercicio({ exercicio, fraturado, classe, criador, lingu
   function fimBatalha() {
     const r = batalha;
     setBatalha(null);
-    if (r !== "vitoria") return;
+    if (r !== "vitoria") { onDerrota?.(); return; }
     // vitória suspeita de jogador comum: o Criador intervém (sem card de vitória)
     if (flags.length > 0 && !criador) {
       onVencer(true, drop);

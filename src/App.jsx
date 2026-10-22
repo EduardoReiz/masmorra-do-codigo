@@ -18,10 +18,11 @@ import { trackDe, rankDe, idsParaComecarEm } from "./dados/exercicios";
 import { AVATAR_PADRAO, equipado, cosmetico, semente } from "./dados/cosmeticos";
 import { ehCriador, AVATAR_CRIADOR, quadroDoCriador } from "./dados/criador";
 import { buffsTotais } from "./dados/equipamento";
+import { abreCinema } from "./Cinema";
 import { monarcaDe } from "./dados/monarcas";
 import { configPersonagem } from "./dados/personagem";
 import { registrarDia, bonusXp } from "./streak";
-import { carregar, salvar, limpar } from "./progresso";
+import { carregar, salvar, limpar, carregarPadrao, guardarDaConta, progressoDaConta, idDaConta } from "./progresso";
 
 // decide a tela inicial a partir do que está salvo
 function telaInicial() {
@@ -72,7 +73,11 @@ function App() {
   // Login (sessão local do protótipo). Depois de entrar, vai escolher o caminho
   // ou direto pro dashboard se já tiver um.
   function entrarConta(conta) {
-    let p = { ...progresso, conta };
+    // outra conta no mesmo navegador: guarda o progresso de quem estava e abre o da conta que entrou
+    guardarDaConta(progresso);
+    const semDono = !progresso.conta && (progresso.classe || progresso.derrotados.length > 0); // progresso antigo, de antes das contas separadas
+    const mesma = semDono || idDaConta(progresso.conta) === idDaConta(conta);
+    let p = mesma ? { ...progresso, conta } : progressoDaConta(conta);
     // o Criador ganha o avatar exclusivo por padrão (se ainda não customizou)
     if (ehCriador(p) && !p.avatar) p.avatar = { ...AVATAR_CRIADOR };
     p = registrarDia(p); // conta o dia de hoje ao entrar
@@ -81,7 +86,8 @@ function App() {
   }
 
   function sairConta() {
-    atualizar({ ...progresso, conta: null });
+    guardarDaConta(progresso);
+    atualizar({ ...carregarPadrao() });
     setTela("login");
   }
 
@@ -159,7 +165,9 @@ function App() {
     setComoJogador(false);
     const ex = trackDe(progresso.classe).find((e) => e.id === id);
     const elegivel = ex && !ex.chefe && ex.tipo !== "prompt" && !progresso.derrotados.includes(id);
-    setFraturado(elegivel && Math.random() < CHANCE_FRATURA);
+    const quebrou = elegivel && Math.random() < CHANCE_FRATURA;
+    setFraturado(quebrou);
+    if (quebrou) abreCinema("portal");
     setExId(id);
     // a aula é obrigatória na primeira vez que o aluno enfrenta o monstro
     const temAula = ex && !progresso.derrotados.includes(id) && aulaDe(id, linguagemDoJogador(progresso).id);
@@ -169,7 +177,7 @@ function App() {
   // Calcula o progresso após uma vitória limpa (sem mexer no estado ainda).
   function aposVitoria(base, ex, dropId) {
     if (base.derrotados.includes(ex.id)) return { p: base, subiu: null };
-    const ganho = Math.round(ex.xp * (fraturado ? 2 : 1) * (1 + bonusXp(base.sequencia || 0)) * (1 + buffsTotais(base.equip).xp / 100));
+    const ganho = Math.round(ex.xp * (fraturado ? 2 : 1) * (1 + bonusXp(base.sequencia || 0)) * (1 + buffsTotais(base.equip).xp / 100) * ((base.maldicao || 0) > 0 ? 0.8 : 1));
     const derrotados = [...base.derrotados, ex.id];
     const itens =
       fraturado && !base.itens.includes("fragmento-portal")
@@ -180,7 +188,8 @@ function App() {
     const track = trackDe(base.classe);
     const antes = rankDe(track, base.derrotados);
     const depois = rankDe(track, derrotados);
-    return { p: { ...base, xp: base.xp + ganho, derrotados, itens, itensEquip }, subiu: depois !== antes ? depois : null };
+    const maldicao = Math.max(0, (base.maldicao || 0) - 1); // cada monstro vencido gasta um dos 3 da maldição
+    return { p: { ...base, xp: base.xp + ganho, derrotados, itens, itensEquip, maldicao }, subiu: depois !== antes ? depois : null };
   }
 
   // Tira um rank: remove o último Exame (chefe) vencido da track.
@@ -298,6 +307,11 @@ function App() {
         onEquipar={equiparItem}
         onAbrirAvatar={() => setTela("avatar")}
         onAparencia={(chave, valor) => atualizar({ ...progresso, [chave]: valor })}
+        onQuebrarMaldicao={() => {
+          const i = progresso.itens.indexOf("fragmento-portal");
+          if (i < 0 || !(progresso.maldicao > 0)) return;
+          atualizar({ ...progresso, maldicao: 0, itens: progresso.itens.filter((_, k) => k !== i) });
+        }}
         onVoltar={() => setTela("dashboard")}
       />
     );
@@ -347,6 +361,11 @@ function App() {
         heroiSeed={semente(progresso.classe || "Caçador")}
         heroi={{ cfg: configPersonagem(progresso), classe: progresso.classe || "O Arquiteto", equip: progresso.equip || {}, criadorQuadro: ehCriador(progresso) ? quadroDoCriador(progresso) : null }}
         onSair={() => { setTela(comoJogador ? "dominio" : "dashboard"); setComoJogador(false); }}
+        onDerrota={() => {
+          if (comoJogador || (progresso.maldicao || 0) > 0) return; // teste não conta; já amaldiçoado não acumula
+          atualizar({ ...progresso, maldicao: 3 });
+          abreCinema("maldicao");
+        }}
         onVencer={(suspeito, dropId) => {
           if (comoJogador) { setComoJogador(false); setTela("dominio"); return; } // teste não mexe no progresso
           vencer(ex, suspeito, dropId);
