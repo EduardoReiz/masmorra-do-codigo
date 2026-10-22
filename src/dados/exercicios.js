@@ -58,6 +58,21 @@ export const EXERCICIOS = [
     }),
   },
   {
+    id: "dano", fn: "danoFinal", nivel: "E", xp: 100,
+    titulo: "Goblin Esmagador", fraqueza: "Funções com dois valores", tempo: "~6 min", arte: "soma",
+    enunciado:
+      "O goblin ataca com uma força (ataque) e a sua armadura absorve parte do golpe (defesa). " +
+      "Escreva danoFinal(ataque, defesa) que devolve quanta vida você perde: o ataque menos a defesa. Ex: danoFinal(30, 12) devolve 18.",
+    starter: "function danoFinal(ataque, defesa) {\n  // ataque menos defesa\n\n}\n",
+    molde: true,
+    solucao: (a, d) => a - d,
+    gerarEntradas: (r) => ({
+      publicas: [[30, 12], [50, 50], [intEntre(r, 20, 60), intEntre(r, 1, 19)]],
+      ocultas: [[100, 1], [intEntre(r, 70, 99), intEntre(r, 10, 69)]],
+      fratura: [[intEntre(r, 500, 999), intEntre(r, 1, 499)], [7, 3], [40, 40]],
+    }),
+  },
+  {
     id: "par", fn: "ehPar", nivel: "E", xp: 120,
     titulo: "Slime da Paridade", fraqueza: "Resto da divisão", tempo: "~8 min",
     enunciado: "Escreva ehPar(n) que devolve true se n for par e false se for ímpar.",
@@ -68,6 +83,36 @@ export const EXERCICIOS = [
       publicas: [[4], [7], [intEntre(r, 0, 40)]],
       ocultas: [[0], [-2], [2 * intEntre(r, 1, 500) + 1]],
       fratura: [[intEntre(r, -300, 300)], [2 * intEntre(r, 100, 5000)], [2 * intEntre(r, 1, 999) + 1]],
+    }),
+  },
+  {
+    id: "cura", fn: "curar", nivel: "E", xp: 120,
+    titulo: "Frasco Transbordante", fraqueza: "Decisões com if", tempo: "~8 min", arte: "par",
+    enunciado:
+      "Uma poção devolve vida, mas a vida nunca passa de 100. Escreva curar(vida, pocao) que devolve a vida depois de beber a poção, " +
+      "com no máximo 100. Ex: curar(60, 30) devolve 90 e curar(90, 30) devolve 100.",
+    starter: "function curar(vida, pocao) {\n  // vida + pocao, mas nunca mais que 100\n\n}\n",
+    molde: true,
+    solucao: (v, p) => Math.min(100, v + p),
+    gerarEntradas: (r) => ({
+      publicas: [[60, 30], [90, 30], [intEntre(r, 10, 50), intEntre(r, 10, 30)]],
+      ocultas: [[100, 20], [0, 100], [intEntre(r, 70, 99), intEntre(r, 30, 60)]],
+      fratura: [[intEntre(r, 1, 40), intEntre(r, 1, 30)], [99, 1], [50, 50], [100, 0]],
+    }),
+  },
+  {
+    id: "critico", fn: "ataqueFinal", nivel: "E", xp: 120,
+    titulo: "Dragão da Sorte", fraqueza: "Decisões com if e else", tempo: "~8 min", arte: "fib",
+    enunciado:
+      "Um golpe pode ser crítico. Escreva ataqueFinal(base, sorte): se a sorte (de 1 a 100) for 90 ou mais, o golpe é crítico " +
+      "e causa o DOBRO do dano base; senão, causa o dano base. Ex: ataqueFinal(20, 95) devolve 40 e ataqueFinal(20, 50) devolve 20.",
+    starter: "function ataqueFinal(base, sorte) {\n  // crítico (sorte >= 90) dobra o dano\n\n}\n",
+    molde: true,
+    solucao: (b, s) => (s >= 90 ? b * 2 : b),
+    gerarEntradas: (r) => ({
+      publicas: [[20, 95], [20, 50], [intEntre(r, 10, 40), intEntre(r, 1, 80)]],
+      ocultas: [[35, 90], [35, 89], [intEntre(r, 10, 60), intEntre(r, 91, 100)]],
+      fratura: [[intEntre(r, 50, 200), 100], [intEntre(r, 50, 200), 1], [1, 90], [80, 89]],
     }),
   },
   {
@@ -116,6 +161,21 @@ export const EXERCICIOS = [
     }),
   },
   {
+    id: "ouro", fn: "ouroTotal", nivel: "D", xp: 180,
+    titulo: "Baú do Avarento", fraqueza: "Somar uma lista", tempo: "~10 min", arte: "maior",
+    enunciado:
+      "Cada baú da masmorra tem uma quantia de ouro. Escreva ouroTotal(baus) que recebe a lista com o ouro de cada baú e devolve a soma. " +
+      "Ex: ouroTotal([10, 25, 5]) devolve 40.",
+    starter: "function ouroTotal(baus) {\n  // some o ouro de todos os baús\n\n}\n",
+    molde: true,
+    solucao: (l) => l.reduce((a, b) => a + b, 0),
+    gerarEntradas: (r) => ({
+      publicas: [[[10, 25, 5]], [listaInts(r, 4, 1, 50)], [[]]],
+      ocultas: [[[100]], [listaInts(r, 6, 0, 100)]],
+      fratura: [[listaInts(r, 10, 1, 500)], [[0, 0, 0]], [listaInts(r, 3, 100, 999)]],
+    }),
+  },
+  {
     id: "vogais", fn: "contaVogais", nivel: "D", xp: 180,
     titulo: "Espectro das Palavras", fraqueza: "Percorrer texto", tempo: "~12 min",
     enunciado:
@@ -133,6 +193,50 @@ export const EXERCICIOS = [
       { in: ["aeiouaeiou"], out: 10, publico: false },
       { in: ["bcdfg"], out: 0, publico: false },
       { in: ["programacao"], out: 5, publico: false },
+    ],
+  },
+  {
+    id: "rank", fn: "rankDoXp", nivel: "D", xp: 200,
+    titulo: "Escriba dos Ranks", fraqueza: "Várias decisões em sequência", tempo: "~10 min", arte: "vogais",
+    enunciado:
+      "O Sistema define o seu rank pelo XP. Escreva rankDoXp(xp) que devolve a letra do rank: " +
+      '"E" se o xp for menor que 100, "D" se for menor que 300, "C" se for menor que 600 e "B" de 600 para cima.',
+    starter: "function rankDoXp(xp) {\n  // devolva \"E\", \"D\", \"C\" ou \"B\"\n\n}\n",
+    testes: [
+      { in: [50], out: "E", publico: true },
+      { in: [100], out: "D", publico: true },
+      { in: [450], out: "C", publico: true },
+      { in: [0], out: "E", publico: false },
+      { in: [299], out: "D", publico: false },
+      { in: [300], out: "C", publico: false },
+      { in: [599], out: "C", publico: false },
+      { in: [600], out: "B", publico: false },
+      { in: [5000], out: "B", publico: false },
+    ],
+    fratura: [
+      { in: [99], out: "E", publico: false },
+      { in: [301], out: "C", publico: false },
+      { in: [601], out: "B", publico: false },
+    ],
+  },
+  {
+    id: "inventario", fn: "temItem", nivel: "D", xp: 200,
+    titulo: "Mochila Sem Fundo", fraqueza: "Procurar em uma lista", tempo: "~10 min", arte: "palavras",
+    enunciado:
+      "Antes de entrar na batalha, você confere a mochila. Escreva temItem(mochila, item) que devolve true se o item estiver na lista " +
+      'e false se não estiver. Ex: temItem(["espada", "poção"], "poção") devolve true.',
+    starter: "function temItem(mochila, item) {\n  // true se o item está na mochila\n\n}\n",
+    testes: [
+      { in: [["espada", "escudo", "poção"], "escudo"], out: true, publico: true },
+      { in: [["espada", "escudo"], "arco"], out: false, publico: true },
+      { in: [[], "espada"], out: false, publico: true },
+      { in: [["poção"], "poção"], out: true, publico: false },
+      { in: [["Espada"], "espada"], out: false, publico: false },
+      { in: [["a", "b", "c", "d"], "d"], out: true, publico: false },
+    ],
+    fratura: [
+      { in: [["elmo", "bota", "capa"], "capa"], out: true, publico: false },
+      { in: [["elmo", "bota", "capa"], "cap"], out: false, publico: false },
     ],
   },
   {

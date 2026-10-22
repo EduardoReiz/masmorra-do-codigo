@@ -1,7 +1,6 @@
 import { useRef, useEffect } from "react";
 import "./App.css";
 import Personagem from "./Personagem";
-import { ehCriador } from "./dados/criador";
 
 // Mapa da masmorra em pixel art, desenhado em canvas de baixa resolução e
 // ampliado (pixelated). Cada monstro da trilha da classe é um ponto do caminho:
@@ -359,9 +358,7 @@ export default function MapaMasmorra({ progresso, track, idxAtual, focoRef, ocul
     <div className={"mapa-fundo" + (oculto ? " oculto" : "")} aria-hidden="true">
       <canvas ref={ref} className="mapa-canvas" />
       <div ref={heroiRef} className="mapa-heroi">
-        {ehCriador(progresso)
-          ? <img className="mapa-criador" src="/criador/criador-heroi.png" alt="" draggable="false" />
-          : <Personagem progresso={progresso} tamanho={72} />}
+        <Personagem progresso={progresso} tamanho={72} />
       </div>
     </div>
   );

@@ -14,6 +14,48 @@ const V = [
 
 export const ESTRATEGISTA = [
   {
+    id: "dat-quantos", fn: "quantosItens", nivel: "E", xp: 100, tipo: "dados", base: V, arte: "dat-conta",
+    titulo: "Contador de Estoque", fraqueza: "Tamanho de uma lista", tempo: "~5 min",
+    enunciado:
+      "Toda análise começa contando. Escreva quantosItens(vendas) que recebe a base (uma lista) e devolve quantos itens ela tem.",
+    starter: "function quantosItens(vendas) {\n  // devolva quantos itens há na lista\n\n}\n",
+    testes: [
+      { in: [V], out: 5, publico: true },
+      { in: [[]], out: 0, publico: true },
+      { in: [[{ produto: "X", categoria: "a", preco: 10, qtd: 3 }]], out: 1, publico: true },
+      { in: [[{ produto: "A", categoria: "a", preco: 1, qtd: 1 }, { produto: "B", categoria: "a", preco: 2, qtd: 2 }]], out: 2, publico: false },
+    ],
+  },
+  {
+    id: "dat-caro", fn: "maisCaro", nivel: "E", xp: 120, tipo: "dados", base: V, arte: "dat-media",
+    titulo: "Vidente dos Preços", fraqueza: "Achar o maior valor", tempo: "~8 min",
+    enunciado:
+      "Qual item da loja custa mais? Escreva maisCaro(vendas) que devolve o MAIOR preço entre os itens da base " +
+      "(só o número do preço). Se a base estiver vazia, devolva 0.",
+    starter: "function maisCaro(vendas) {\n  // devolva o maior preco\n\n}\n",
+    testes: [
+      { in: [V], out: 120, publico: true },
+      { in: [[{ produto: "X", categoria: "a", preco: 10, qtd: 3 }]], out: 10, publico: true },
+      { in: [[]], out: 0, publico: true },
+      { in: [[{ produto: "A", categoria: "a", preco: 5, qtd: 1 }, { produto: "B", categoria: "a", preco: 9, qtd: 1 }, { produto: "C", categoria: "a", preco: 7, qtd: 1 }]], out: 9, publico: false },
+      { in: [[{ produto: "A", categoria: "a", preco: 4, qtd: 1 }, { produto: "B", categoria: "a", preco: 4, qtd: 1 }]], out: 4, publico: false },
+    ],
+  },
+  {
+    id: "dat-nomes", fn: "nomesDosItens", nivel: "E", xp: 120, tipo: "dados", base: V, arte: "dat-filtra",
+    titulo: "Escrivão do Catálogo", fraqueza: "Pegar um campo de cada item", tempo: "~8 min",
+    enunciado:
+      "Escreva nomesDosItens(vendas) que devolve uma lista só com o nome (campo produto) de cada item, na mesma ordem. " +
+      'Ex: para a base de exemplo devolve ["Espada", "Escudo", "Poção", "Arco", "Elmo"].',
+    starter: "function nomesDosItens(vendas) {\n  // devolva a lista com o produto de cada item\n\n}\n",
+    testes: [
+      { in: [V], out: ["Espada", "Escudo", "Poção", "Arco", "Elmo"], publico: true },
+      { in: [[]], out: [], publico: true },
+      { in: [[{ produto: "X", categoria: "a", preco: 10, qtd: 3 }]], out: ["X"], publico: true },
+      { in: [[{ produto: "B", categoria: "a", preco: 1, qtd: 1 }, { produto: "A", categoria: "a", preco: 2, qtd: 2 }]], out: ["B", "A"], publico: false },
+    ],
+  },
+  {
     id: "dat-total", fn: "totalVendas", nivel: "E", xp: 150, tipo: "dados", base: V,
     titulo: "Espectro das Planilhas", fraqueza: "Agregação (soma)", tempo: "~12 min",
     enunciado:

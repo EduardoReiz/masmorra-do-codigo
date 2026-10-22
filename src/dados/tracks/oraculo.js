@@ -15,6 +15,33 @@ const doisExemplos = (t) => (t.match(/exemplo/gi) || []).length >= 2;
 
 export const ORACULO = [
   {
+    id: "orac-pedido", tipo: "prompt", nivel: "E", xp: 80, arte: "orac-resumo",
+    titulo: "Eco Mudo", fraqueza: "Pedir de forma direta", tempo: "~4 min",
+    enunciado:
+      "Seu primeiro prompt! Peça à IA uma receita de bolo de chocolate. Comece com um verbo que diga o que você quer " +
+      "(escreva, crie, me dê, ensine...) e diga qual é o assunto.",
+    placeholder: "Escreva aqui o que você pediria para a IA...",
+    requisitos: [
+      { nome: "Começa com um pedido claro (escreva, crie, me dê, ensine...)", ok: (t) => /(escreva|crie|me d[eê]|d[eê]-me|ensine|quero|preciso|fa[cç]a|mostre|monte)/i.test(t) },
+      { nome: "Diz o assunto (receita de bolo de chocolate)", ok: (t) => /bolo/i.test(t) && /chocolate/i.test(t) },
+      { nome: "Tem pelo menos uma frase completa", ok: min(25) },
+    ],
+  },
+  {
+    id: "orac-contexto", tipo: "prompt", nivel: "E", xp: 100, arte: "orac-explica",
+    titulo: "Sombra do Contexto", fraqueza: "Dar contexto", tempo: "~6 min",
+    enunciado:
+      "Peça à IA ideias de presente de aniversário. Mas dê contexto: diga PARA QUEM é o presente e QUANTO você pode gastar. " +
+      "Quanto mais a IA souber, melhor a sugestão.",
+    placeholder: "Escreva aqui o prompt pedindo ideias de presente...",
+    requisitos: [
+      { nome: "Pede ideias ou sugestões de presente", ok: (t) => /(ideia|sugest|sugira|recomend|presente)/i.test(t) && /presente/i.test(t) },
+      { nome: "Diz para quem é (mãe, amigo, irmã, colega...)", ok: (t) => /(m[aã]e|pai|amig|irm[aã]o?|namorad|colega|av[oó]|prim[oa]|professor|chefe|esposa|marido)/i.test(t) },
+      { nome: "Diz quanto pode gastar (orçamento)", ok: (t) => /(r\$|reais|or[cç]amento|gastar|at[eé] \d|\d+ reais)/i.test(t) },
+      { nome: "Tem detalhe suficiente (não é vago)", ok: min(60) },
+    ],
+  },
+  {
     id: "orac-explica", tipo: "prompt", nivel: "E", xp: 120,
     titulo: "Eco do Prompt Vago", fraqueza: "Clareza", tempo: "~8 min",
     enunciado:

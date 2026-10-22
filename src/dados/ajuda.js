@@ -3,6 +3,62 @@
 // ar); abre uma BUSCA no YouTube já montada com o tema + canais que ensinam
 // bem (Curso em Vídeo / Gustavo Guanabara e cia), caindo sempre em algo útil.
 export const AJUDA = {
+  "dano": {
+    dica: "Uma função pode receber vários valores, separados por vírgula. Aqui, basta devolver o ataque menos a defesa.",
+    aula: { canal: "Curso em Vídeo", q: "curso em video funções parâmetros python" },
+  },
+  "cura": {
+    dica: "Some a vida com a poção. Se o total passar de 100, use um if para voltar para 100. Depois devolva o total.",
+    aula: { canal: "Curso em Vídeo", q: "curso em video python condições if else" },
+  },
+  "critico": {
+    dica: "Comece com o dano normal. Se a sorte for 90 ou mais (>=), troque pelo dobro. Depois devolva o dano.",
+    aula: { canal: "Curso em Vídeo", q: "curso em video python condições simples e compostas" },
+  },
+  "ouro": {
+    dica: "Comece o total em 0, percorra a lista somando cada valor e devolva o total no final, fora do laço.",
+    aula: { canal: "Curso em Vídeo", q: "curso em video python laço for somar" },
+  },
+  "rank": {
+    dica: "Pergunte do menor limite para o maior, com um return dentro de cada if. O último return, sem if, cobre o resto.",
+    aula: { canal: "Curso em Vídeo", q: "curso em video python condições aninhadas elif" },
+  },
+  "inventario": {
+    dica: "Percorra a lista comparando cada item com o procurado. Se for igual, devolva true na hora. Só depois do laço devolva false.",
+    aula: { canal: "Curso em Vídeo", q: "curso em video python listas procurar item" },
+  },
+  "sec-vazio": {
+    dica: "Use texto.trim() para tirar os espaços das pontas e compare o resultado com o texto vazio (\"\").",
+    aula: { canal: "Curso em Vídeo", q: "curso em video javascript strings métodos trim" },
+  },
+  "sec-tamanho": {
+    dica: "Texto tem uma propriedade length, que é o número de caracteres. Compare com 8 usando <.",
+    aula: { canal: "Curso em Vídeo", q: "curso em video javascript strings length" },
+  },
+  "sec-papel": {
+    dica: "Compare o papel com \"admin\" e com \"moderador\" e junte as duas respostas com || (OU).",
+    aula: { canal: "Curso em Vídeo", q: "curso em video javascript operadores lógicos" },
+  },
+  "dat-quantos": {
+    dica: "A lista tem uma propriedade length que diz quantos itens ela tem. É só devolver ela.",
+    aula: { canal: "Curso em Vídeo", q: "curso em video javascript arrays length" },
+  },
+  "dat-caro": {
+    dica: "Comece o recorde em 0 e percorra a lista. Se o preço do item for maior que o recorde, troque o recorde.",
+    aula: { canal: "Curso em Vídeo", q: "curso em video javascript arrays percorrer maior valor" },
+  },
+  "dat-nomes": {
+    dica: "Crie uma lista vazia ([]), percorra as vendas e use push para colocar o produto de cada uma. Devolva a lista.",
+    aula: { canal: "Curso em Vídeo", q: "curso em video javascript arrays push" },
+  },
+  "orac-pedido": {
+    dica: "Comece com um verbo (me dê, escreva, crie) e diga o assunto: bolo de chocolate. Uma frase completa.",
+    aula: { canal: "Curso em Vídeo", q: "engenharia de prompt para iniciantes como pedir" },
+  },
+  "orac-contexto": {
+    dica: "Diga que quer ideias de presente, para quem é (mãe, amigo...) e quanto pode gastar em reais. Quanto mais contexto, melhor.",
+    aula: { canal: "Curso em Vídeo", q: "engenharia de prompt contexto" },
+  },
   oi: {
     dica: 'Em JavaScript use console.log("texto"); em Python use print("texto"). O texto vai entre aspas, e o que está entre aspas aparece igualzinho na tela.',
     aula: { canal: "Curso em Vídeo", q: "curso em video python mundo 1 primeiro programa print" },

@@ -3,6 +3,64 @@
 // ATAQUE: se o código continua vulnerável, não passa. Ensina defesa de verdade.
 export const SENTINELA = [
   {
+    id: "sec-vazio", fn: "campoVazio", nivel: "E", xp: 100, tipo: "seguranca",
+    titulo: "Vigia do Campo Vazio", fraqueza: "Conferir a entrada", tempo: "~6 min", arte: "sec-senha",
+    enunciado:
+      "Todo ataque começa numa entrada que o programa não conferiu. A primeira defesa é simples: recusar o que veio vazio. " +
+      'Escreva campoVazio(texto) que devolve true se o texto for vazio ou tiver só espaços, e false caso contrário. Ex: campoVazio("   ") devolve true.',
+    starter: "function campoVazio(texto) {\n  // true se vazio ou só espaços\n\n}\n",
+    testes: [
+      { in: [""], out: true, publico: true },
+      { in: ["   "], out: true, publico: true },
+      { in: ["oi"], out: false, publico: true },
+      { in: [" a "], out: false, publico: false },
+      { in: ["\t"], out: true, publico: false },
+    ],
+    fratura: [
+      { in: ["0"], out: false, publico: false },
+      { in: ["       x"], out: false, publico: false },
+    ],
+  },
+  {
+    id: "sec-tamanho", fn: "senhaCurta", nivel: "E", xp: 120, tipo: "seguranca",
+    titulo: "Medidor de Senha", fraqueza: "Comparar tamanhos", tempo: "~6 min", arte: "sec-senha",
+    enunciado:
+      "Senha curta se adivinha em segundos. Escreva senhaCurta(senha) que devolve true se a senha tiver MENOS de 8 caracteres " +
+      'e false se tiver 8 ou mais. Ex: senhaCurta("abc123") devolve true.',
+    starter: "function senhaCurta(senha) {\n  // true se tiver menos de 8 caracteres\n\n}\n",
+    testes: [
+      { in: ["abc123"], out: true, publico: true },
+      { in: ["abcdefgh"], out: false, publico: true },
+      { in: [""], out: true, publico: true },
+      { in: ["1234567"], out: true, publico: false },
+      { in: ["uma senha bem longa"], out: false, publico: false },
+    ],
+    fratura: [
+      { in: ["12345678"], out: false, publico: false },
+      { in: ["a"], out: true, publico: false },
+    ],
+  },
+  {
+    id: "sec-papel", fn: "podeEntrar", nivel: "E", xp: 140, tipo: "seguranca",
+    titulo: "Porteiro das Salas", fraqueza: "Controle de acesso", tempo: "~8 min", arte: "sec-idade",
+    enunciado:
+      "Nem todo mundo pode entrar em todas as salas. Escreva podeEntrar(papel) que devolve true só para os papéis " +
+      '"admin" e "moderador". Qualquer outro papel (como "visitante") devolve false.',
+    starter: "function podeEntrar(papel) {\n  // true só para admin e moderador\n\n}\n",
+    testes: [
+      { in: ["admin"], out: true, publico: true },
+      { in: ["moderador"], out: true, publico: true },
+      { in: ["visitante"], out: false, publico: true },
+      { in: [""], out: false, publico: false },
+      { in: ["Admin"], out: false, publico: false },
+      { in: ["administrador"], out: false, publico: false },
+    ],
+    fratura: [
+      { in: ["moderadora"], out: false, publico: false },
+      { in: ["ADMIN"], out: false, publico: false },
+    ],
+  },
+  {
     id: "sec-xss", fn: "sanitizarHtml", nivel: "E", xp: 150, tipo: "seguranca",
     titulo: "Golem do XSS", fraqueza: "Escapar HTML", tempo: "~12 min",
     enunciado:
