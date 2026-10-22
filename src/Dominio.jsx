@@ -88,7 +88,7 @@ export default function Dominio({ progresso, onVoltar, onTestarExercicio }) {
       {cena === "despertar" && <Despertar classe={progresso.classe || "O Arquiteto"} onConcluir={fechar} />}
       {cena === "batalha-v" && <Batalha resultado="vitoria" corHeroi={corHeroi} seedHeroi={seedHeroi} heroi={heroi} monstro={monstro} onFim={fechar} />}
       {cena === "batalha-d" && <Batalha resultado="derrota" corHeroi={corHeroi} seedHeroi={seedHeroi} heroi={heroi} monstro={monstro} onFim={fechar} />}
-      {cena === "batalha-c" && <Batalha resultado="derrota" criador corHeroi={corHeroi} seedHeroi={seedHeroi} heroi={heroi} monstro={monstro} onFim={fechar} />}
+      {cena === "batalha-c" && <Batalha resultado="derrota" criador medo corHeroi={corHeroi} seedHeroi={seedHeroi} heroi={heroi} monstro={monstro} onFim={fechar} />}
       {cena === "prova" && <Prova prova={PROVAS["exame-d"]} onAprovado={fechar} onReprovado={fechar} />}
       {cena === "monarca" && <AscensaoMonarca monarca={monarcaDe(progresso.classe)} onAceitar={fechar} onRecusar={fechar} />}
       {cena === "criador-warn" && <CriadorAviso tipo="warn" onFechar={fechar} />}

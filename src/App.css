@@ -3260,3 +3260,6 @@ body.sem-cursor {
 .aula-check.ok { color: #cfe9ff; }
 .aula-check.ok b { color: #35e08a; }
 .aula-prompt-edicao { width: 100%; min-height: 160px; }
+
+.criador-pixel { display: block; image-rendering: pixelated; object-fit: contain; }
+.retrato-criador { filter: drop-shadow(0 0 10px rgba(138, 43, 226, 0.65)); animation: criadorPaira 2.4s ease-in-out infinite; }

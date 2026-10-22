@@ -336,6 +336,7 @@ export default function Exercicio({ exercicio, fraturado, classe, criador, lingu
           heroi={heroi}
           monstro={{ id: arte, nome: ex.titulo, nivel: nivelMostrado }}
           fraturado={fraturado}
+          criador={criador}
           onFim={fimBatalha}
         />
       )}

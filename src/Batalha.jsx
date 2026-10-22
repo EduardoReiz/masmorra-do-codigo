@@ -43,10 +43,10 @@ function matriz(seed, cols, linhas, limiar) {
   return cells;
 }
 
-export default function Batalha({ resultado, corHeroi, seedHeroi, heroi: heroiCfg, monstro, fraturado, criador, onFim }) {
+export default function Batalha({ resultado, corHeroi, seedHeroi, heroi: heroiCfg, monstro, fraturado, criador, medo, onFim }) {
   const ref = useRef(null);
   const pularRef = useRef(false);
-  const falaRef = useRef(criador ? falaReverente() : "");
+  const falaRef = useRef(medo ? falaReverente() : "");
 
   useEffect(() => {
     const canvas = ref.current;
@@ -58,7 +58,7 @@ export default function Batalha({ resultado, corHeroi, seedHeroi, heroi: heroiCf
     const sprite = heroiCfg ? { ...heroiCfg, ...paletasEquip(heroiCfg.equip) } : null;
     const tipoArma = sprite ? (ROUPA_CLASSE[sprite.classe] || ROUPA_CLASSE["O Arquiteto"]).arma : "espada";
     const corpoACorpo = tipoArma === "espada";
-    const SC = 2; // o sprite é 40x48: cada pixel dele ocupa 2 da cena (80x96)
+    const SC = 3;
     const MCELL = 11;
     const monMat = matriz(semente(monstro.nome), 9, 7, 0.4);
 
@@ -74,7 +74,7 @@ export default function Batalha({ resultado, corHeroi, seedHeroi, heroi: heroiCf
       "O Sentinela": "cenario-sentinela", "O Oráculo": "cenario-oraculo",
     };
     // o Criador luta com a arte própria (quadros do jogo em public/criador)
-    const QUADROS_CRIADOR = ["criador-heroi", "criador-heroi-idle2", "criador-heroi-magia", "criador-heroi-vitoria"];
+    const QUADROS_CRIADOR = ["criador-heroi", "criador-heroi-idle2", "criador-heroi-ataque", "criador-heroi-magia", "criador-heroi-vitoria"];
     const quadroCri = {};
     if (criador) {
       for (const n of QUADROS_CRIADOR) {
@@ -173,7 +173,8 @@ export default function Batalha({ resultado, corHeroi, seedHeroi, heroi: heroiCf
 
     function drawHeroi(heroX, heroY, alpha, acting, ph, pose) {
       if (alpha <= 0) return;
-      const qc = criador && (quadroCri[pose] || quadroCri[Math.floor(t / 14) % 2 ? "criador-heroi-idle2" : "criador-heroi"]);
+      const poseAtual = pose || (criador && acting ? "criador-heroi-ataque" : null);
+      const qc = criador && (quadroCri[poseAtual] || quadroCri[Math.floor(t / 14) % 2 ? "criador-heroi-idle2" : "criador-heroi"]);
       if (qc) {
         const h = 80, w = Math.round((qc.width / qc.height) * h);
         ctx.globalAlpha = alpha;
@@ -186,9 +187,9 @@ export default function Batalha({ resultado, corHeroi, seedHeroi, heroi: heroiCf
         const { grid } = montarSprite({ cfg: sprite.cfg, classe: sprite.classe, dy, piscar: false, pal: sprite.pal, ids: sprite.ids, crista: sprite.crista, acao: acting, ph });
         ctx.globalAlpha = alpha;
         ctx.fillStyle = "rgba(0,0,0,0.35)";
-        ctx.fillRect(Math.round(heroX) + 22, GROUND, 36, 2);
-        for (let y = 0; y < 48; y++) for (let x = 0; x < 40; x++) {
-          const c = grid[y * 40 + x];
+        ctx.fillRect(Math.round(heroX) + 18, GROUND, 24, 2);
+        for (let y = 0; y < 24; y++) for (let x = 0; x < 20; x++) {
+          const c = grid[y * 20 + x];
           if (c) { ctx.fillStyle = c; ctx.fillRect(Math.round(heroX) + x * SC, Math.round(heroY) + y * SC, SC, SC); }
         }
         ctx.globalAlpha = 1;
@@ -199,7 +200,7 @@ export default function Batalha({ resultado, corHeroi, seedHeroi, heroi: heroiCf
 
     function draw() {
       const p = t / DUR;
-      const heroYbase = sprite ? 56 : 90;
+      const heroYbase = sprite ? 84 : 90;
       const bobH = Math.sin(t * 0.22) * 1.2;
       const bobM = Math.sin(t * 0.22 + 1.2) * 1.4;
 
@@ -213,7 +214,7 @@ export default function Batalha({ resultado, corHeroi, seedHeroi, heroi: heroiCf
         const e = p / 0.12;
         heroX = -24 + e * 94;
         monCx = 324 - e * 86;
-      } else if (criador) {
+      } else if (medo) {
         // os monstros TEMEM o Criador: ele ergue a chama negra, eles recuam e somem
         const k = clamp((p - 0.3) / 0.7, 0, 1);
         if (p > 0.2 && p < 0.55) pose = "criador-heroi-magia";
@@ -233,7 +234,7 @@ export default function Batalha({ resultado, corHeroi, seedHeroi, heroi: heroiCf
         const b = (p - 0.30) / 0.22;
         acting = true;
         ph = clamp(b / 0.8, 0, 1);
-        if (corpoACorpo) heroX = 70 + bump(b) * 60;
+        if (corpoACorpo) heroX = 70 + bump(b) * 80;
         if (vitoria) {
           if (b >= 0.5) {
             const kk = clamp((b - 0.5) / 0.5, 0, 1);
@@ -291,7 +292,7 @@ export default function Batalha({ resultado, corHeroi, seedHeroi, heroi: heroiCf
       // projétil dos ataques à distância (durante o ataque do herói)
       if (sprite && !corpoACorpo && p >= 0.33 && p < 0.47 && (vitoria || p < 0.42)) {
         const k = (p - 0.33) / 0.14;
-        const px0 = heroX + 74, py0 = 118, px1 = monCx - 10, py1 = 118;
+        const px0 = heroX + 57, py0 = 126, px1 = monCx - 10, py1 = 118;
         const xx = px0 + (px1 - px0) * k, yy = py0 + (py1 - py0) * k;
         if (tipoArma === "arco") {
           ctx.fillStyle = "#c8b090"; ctx.fillRect(Math.round(xx) - 10, Math.round(yy), 10, 2);
@@ -310,7 +311,7 @@ export default function Batalha({ resultado, corHeroi, seedHeroi, heroi: heroiCf
 
       if (spark) faiscas(spark.x, spark.y, spark.k);
 
-      if (criador) {
+      if (medo) {
         if (p > 0.5) texto(vitoria ? "O CRIADOR PREVALECE" : "ELES O TEMEM", "#a98fe0", 15);
       } else if (vitoria) {
         if (p > 0.58) texto("VITÓRIA", "#0beef5");
@@ -333,7 +334,7 @@ export default function Batalha({ resultado, corHeroi, seedHeroi, heroi: heroiCf
   return (
     <div className="batalha" onClick={() => (pularRef.current = true)}>
       <canvas ref={ref} width={RES_W} height={RES_H} className="batalha-canvas" />
-      {criador && resultado === "derrota" && <div className="batalha-fala">"{falaRef.current}"</div>}
+      {medo && resultado === "derrota" && <div className="batalha-fala">"{falaRef.current}"</div>}
       <div className="batalha-pular">clique para pular</div>
     </div>
   );
